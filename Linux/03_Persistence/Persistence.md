@@ -1,4 +1,4 @@
-## Introduction
+# Introduction
 Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 
 1. [Account Creation (User or Root)](#account-creation-user-or-root)
@@ -23,17 +23,17 @@ Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 
 ## Account Creation (User or Root)
 
-# Check passwd file.
+### Check passwd file.
 Ubuntu, Debian, CentOS, Fedora:
 /etc/passwd
 
 FreeBSD:
 /etc/master.passwd
 
-# Check it with Velociraptor
+### Check it with Velociraptor
 Default artifact: Linux.Sys.Users
 
-# Custom Notebook query
+### Custom Notebook query
 ```sql
 /*
 # Linux.Sys.Users
@@ -46,16 +46,16 @@ LIMIT 50
 
 ## SSH
 
-# Authorized Keys
+### Authorized Keys
 
 Check authorized_keys file.
 
 /home/\<username>/.ssh/authorized_keys
 
-# Check it with Velociraptor:
+### Check it with Velociraptor:
 Default artifact: Linux.Ssh.AuthorizedKeys
 
-# Private Keys
+### Private Keys
 
 Check private k
 
