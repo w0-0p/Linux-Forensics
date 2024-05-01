@@ -30,7 +30,7 @@ Ubuntu, Debian, CentOS, Fedora:
 FreeBSD:
 /etc/master.passwd
 
-### Check it with Velociraptor
+#### Check it with Velociraptor
 Default artifact: Linux.Sys.Users
 
 ### Custom Notebook query
@@ -52,7 +52,7 @@ Check authorized_keys file.
 
 /home/\<username>/.ssh/authorized_keys
 
-### Check it with Velociraptor:
+#### Check it with Velociraptor:
 Default artifact: Linux.Ssh.AuthorizedKeys
 
 ### Private Keys
