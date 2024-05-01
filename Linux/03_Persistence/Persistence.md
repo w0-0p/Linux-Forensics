@@ -2,7 +2,7 @@
 Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 
 1. [Account Creation (User or Root)](#account-creation-user-or-root)
-2. [SSH Authorized Keys](#ssh-authorized-keys) 
+2. [SSH Keys](#ssh-keys) 
 4. [Cron Jobs](#cron-jobs)
 5. [Systemd Services and Timers](#systemd-services-and-timers)
 6. [Shell Configuration Modification](#shell-configuration-modification)
@@ -44,7 +44,7 @@ and NOT Shell =~"false"
 LIMIT 50
 ```
 
-## SSH
+## SSH Keys
 
 ### Authorized Keys
 
