@@ -5,3 +5,8 @@ The aims of this repo are:
    The hunting techniques should be checked with the main Linux distros.
 3. Improve Velociraptor to fill missing gaps, either in the code base
    or with additionnal artifacts.
+
+
+To Do:
+- test artifact Linux.Collection.CatScale
+- create artifact for Shell Configuration files

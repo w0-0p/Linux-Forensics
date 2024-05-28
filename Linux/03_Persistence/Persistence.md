@@ -33,7 +33,7 @@ FreeBSD:
 #### Check it with Velociraptor
 Default artifact: Linux.Sys.Users
 
-### Custom Notebook query
+### Post-process Notebook query (example)
 ```sql
 /*
 # Linux.Sys.Users
@@ -57,7 +57,12 @@ Default artifact: Linux.Ssh.AuthorizedKeys
 
 ### Private Keys
 
-Check private k
+Check private keys in directory.
+
+/home/\<username>/.ssh
+
+#### Check it with Velociraptor:
+Default artifact: Linux.Ssh.PrivateKeys
 
 ## Cron Jobs
 
@@ -68,8 +73,10 @@ Check cron tab files in:
 – /etc/cron.{hourly,daily,weekly,monthly}/*
 – /var/spool/cron/crontab/*
 
-Check it with Velociraptor:
+#### Check it with Velociraptor:
 
+Default artifact: Linux.Sys.Crontab
+Or with custom artifact: Linux.Collection.Autoruns
 
 ## Systemd Services and Timers
 
@@ -79,24 +86,39 @@ Check service files:
 Check timer files:
 /etc/systemd/system/*.timer
 
-Check it with Velociraptor:
+#### Check it with Velociraptor:
+
+Default artifact: Linux.Sys.Services
+
+### Custom Notebook query
+```sql
+/*
+# System Timers
+*/
+LET services = SELECT Stdout FROM execve(argv=['systemctl', 'list-units',  '--type=timer'])
+
+LET all_services = SELECT grok(grok="%{NOTSPACE:Unit}%{SPACE}%{NOTSPACE:Load}%{SPACE}%{NOTSPACE:Active}%{SPACE}%{NOTSPACE:Sub}%{SPACE}%{GREEDYDATA:Description}", data=Line) AS Parsed
+FROM parse_lines(accessor="data", filename=services.Stdout)
+
+SELECT * FROM foreach(row=all_services, column="Parsed") WHERE Unit =~ ".timer"
+```
 
 ## Shell Configuration Modification
 
-Files	Working
-/etc/bash.bashrc    systemwide files executed at the start of interactive shell
-(tmux)
-/etc/bash_logout	Systemwide files executed when we terminate the shell
-~/.bashrc	        Widly exploited user specific startup script executed at
-                    the start of shell
-~/.bash_profile, ~/.bash_login, ~/.profile	User specific files , but which found first are executed
-                                            first
-~.bash_logout	    User specific files, executed when shell session closes
-~/.bash_logout	    User-specific clean up script at the end of the session
-/etc/profile	    Systemwide files executed at the start of login shells
-/etc/profile.d	    all the .sh files are exeucted at the start of login shells
+| Files | Working |
+|-------|---------|
+| /etc/bash.bashrc | systemwide files executed at the start of interactive shell |
+| /etc/bash_logout | Systemwide files executed when we terminate the shell |
+| ~/.bashrc	| Widly exploited user specific startup script executed at the start of shell |
+| ~/.bash_profile, ~/.bash_login, ~/.profile | User specific files , but which found first are executed first |
+| ~.bash_logout | User specific files, executed when shell session closes |
+| ~/.bash_logout | User-specific clean up script at the end of the session |
+| /etc/profile | Systemwide files executed at the start of login shells |
+| /etc/profile.d | all the .sh files are executed at the start of login shells |
 
-Check it with Velociraptor:
+#### Check it with Velociraptor:
+
+Inspect Bash logout files: Linux.System.BashLogout
 
 ## Shared object Library
 
