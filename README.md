@@ -12,3 +12,4 @@ To Do:
    - Linux.Collection.CatScale
    - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
 - create artifact for Shell Configuration files
+- test ssh bruteforce and check logs
