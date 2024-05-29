@@ -8,5 +8,7 @@ The aims of this repo are:
 
 
 To Do:
-- test artifact Linux.Collection.CatScale
+- test artifact in other distro:
+   - Linux.Collection.CatScale
+   - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
 - create artifact for Shell Configuration files

@@ -119,30 +119,56 @@ SELECT * FROM foreach(row=all_services, column="Parsed") WHERE Unit =~ ".timer"
 #### Check it with Velociraptor:
 
 Inspect Bash logout files: Linux.System.BashLogout
+Search for files: Linux.Search.FileFinder
 
 ## Shared object Library
+To Check:
+- Env virable LD_PRELOAD in /etc/profile or a script in /etc/profile.d/
+- File /etc/ld.so.preload
+- Otherwise, inspect individual processes
+- Use tools like chkrootkit and rkhunter to scan for rootkits and suspicious files.
 
 ## SUID
+#### Check it with Velociraptor:
+Linux.Sys.SUID
+Linux.Detection.AnomalousFiles
+Exchange.Linux.Detection.IncorrectPermissions
 
 ## rc.common
+Execute a command at the end of the boot process.
+To check: File /etc/rc.local
+#### Check it with Velociraptor:
+Linux.Search.FileFinder
 
 ## Systemd Services
-
-## Trap
+Creating a Custom systemd Service for persistence.
+Check service files in: /etc/systemd/system/my_custom_service.service
 
 ## Startup file
+Commonly targeted files include ~/.bashrc, ~/.profile, or ~/.bash_profile
 
 ## System Call
+### Use Emulate/Implement System Call in User-Space
+To Do
+### Alternate System Calls
+To Do
+### Fudging Around Parameters
+To Do
 
 ## MOTD Backdooring
+File in /etc/update-motd.d/
 
 ## APT Backdooring
+APT hook files in /etc/apt/apt.conf.d/
 
 ## Git Backdooring
+### Hook
+Hook files in /.git/hooks/
+### Config
+Config file in /.git/config (global) and in each project in ~/.git/config
 
-## Config
-
-## Backdooring OpenVPN
+## PAM
+Check files in /lib64/security/
 
 
 
