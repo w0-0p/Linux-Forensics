@@ -57,7 +57,9 @@ Default artifact: Linux.Ssh.AuthorizedKeys
 
 ### Private Keys
 
-Check private keys in directory.
+Check if private keys are encrypted in directory.
+--> if not encrypted, it is recommended to revoque 
+these private keys.
 
 /home/\<username>/.ssh
 
@@ -66,12 +68,16 @@ Default artifact: Linux.Ssh.PrivateKeys
 
 ## Cron Jobs
 
-Check cron tab files in:
+Check cron tab files.
 
-– /etc/crontab
-– /etc/cron.d/*
-– /etc/cron.{hourly,daily,weekly,monthly}/*
-– /var/spool/cron/crontab/*
+System-level:
+- /etc/crontab
+- /etc/cron.d/*
+- /etc/cron.{hourly,daily,weekly,monthly}/*
+- /var/spool/cron/crontab/*
+
+User-level:
+- ~/var/spool/cron/crontabs/
 
 #### Check it with Velociraptor:
 
@@ -79,6 +85,7 @@ Default artifact: Linux.Sys.Crontab
 Or with custom artifact: Linux.Collection.Autoruns
 
 ## Systemd Services and Timers
+Creating a Custom systemd Service for persistence.
 
 Check service files: 
 /etc/systemd/system/*.service
@@ -140,12 +147,14 @@ To check: File /etc/rc.local
 #### Check it with Velociraptor:
 Linux.Search.FileFinder
 
-## Systemd Services
-Creating a Custom systemd Service for persistence.
-Check service files in: /etc/systemd/system/my_custom_service.service
-
 ## Startup file
 Commonly targeted files include ~/.bashrc, ~/.profile, or ~/.bash_profile
+
+System-wide
+Check /etc/init.d/, /etc/rc.d/, /etc/systemd/system/
+
+User-specific
+Check ~/.config/autostart/, ~/.config/ (under various subdirectories)
 
 ## System Call
 ### Use Emulate/Implement System Call in User-Space
