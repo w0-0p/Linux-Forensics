@@ -19,6 +19,7 @@ Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 17. [Git Backdooring]
 18. [Config](#config)
 19. [Backdooring OpenVPN]
+20. UDEV **to do** (see book)
 
 
 ## Account Creation (User or Root)
