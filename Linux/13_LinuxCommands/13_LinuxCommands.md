@@ -1,5 +1,8 @@
 # Commands
-
+BPF
+bpftool prog show
+bpftool prog trace show
+dmesg | grep -E '(trace|hook|probe|bpf)'
 
 # Regex
 ## Parameters

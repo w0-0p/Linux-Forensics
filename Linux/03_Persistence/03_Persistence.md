@@ -1,6 +1,3 @@
-# Introduction
-Excellent resource: https://hadess.io/the-art-of-linux-persistence/
-
 1. [Account Creation (User or Root)](#account-creation-user-or-root)
 2. [SSH Keys](#ssh-keys) 
 4. [Cron Jobs](#cron-jobs)
@@ -20,6 +17,7 @@ Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 18. [Config](#config)
 19. [Backdooring OpenVPN]
 20. UDEV **to do** (see book)
+CHECK PANIX tool for additionnal persistence techniques
 
 
 ## Account Creation (User or Root)

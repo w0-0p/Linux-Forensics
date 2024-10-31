@@ -1,10 +1,16 @@
-The aims of this repo are:
-1. Gathering all relevant TTPs threat actors can use in Linux and
+# Aims
+The aims of this doc are:
+1. Gathering relevant TTPs threat actors can use in Linux and
    organize them according the MITRE ATT&CK matrix.
-2. Documenting how Velociraptor could be used to hunt for these TTPs.
-   The hunting techniques should be checked with the main Linux distros.
-3. Improve Velociraptor to fill missing gaps, either in the code base
-   or with additionnal artifacts.
+2. Documenting how Velociraptor can be used to hunt for these TTPs.
+3. Improve Velociraptor Linux detection with additionnal artifacts.
+
+# Credits
+This doc is based on following sources:
+1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale
+2. https://hadess.io/the-art-of-linux-persistence/
+3. https://www.youtube.com/results?search_query=hal+pomeranz+
+4. https://www.youtube.com/@SandflySecurity
 
 
 To Do:
