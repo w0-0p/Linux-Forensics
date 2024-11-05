@@ -19,6 +19,7 @@ Excellent resource: https://hadess.io/the-art-of-linux-persistence/
 17. [Git Backdooring]
 18. [Config](#config)
 19. [Backdooring OpenVPN]
+20. [Rootikits] (#rootikits)
 
 
 ## Account Creation (User or Root)
@@ -178,6 +179,13 @@ Config file in /.git/config (global) and in each project in ~/.git/config
 
 ## PAM
 Check files in /lib64/security/
+
+### Rootkits
+Linux tools:  
+- sudo apt-get install chkrootkit  
+sudo chkrootkit  
+- sudo apt-get install rkhunter  
+sudo rkhunter --check  
 
 
 
