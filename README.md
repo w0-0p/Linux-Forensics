@@ -11,7 +11,12 @@ This doc is based on following sources:
 2. https://hadess.io/the-art-of-linux-persistence/
 3. https://www.youtube.com/results?search_query=hal+pomeranz+
 4. https://www.youtube.com/@SandflySecurity
+5. https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_
 
+
+# Recommended Books  
+- Practical Linux Forensics, Bruce Nikkel  
+- Linux Forensics, Philip Polstra  
 
 To Do:
 - test artifact in other distro:
