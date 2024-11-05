@@ -9,7 +9,10 @@ cat /sys/kernel/debug/tracing/enabled_functions
 Source of great evidence about recent eBPF operations:
 cat /sys/kernel/debug/tracing/trace
 # Commands
-
+BPF
+bpftool prog show
+bpftool prog trace show
+dmesg | grep -E '(trace|hook|probe|bpf)'
 
 
 # Regex
