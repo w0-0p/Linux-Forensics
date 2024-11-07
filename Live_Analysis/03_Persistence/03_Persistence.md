@@ -1,3 +1,22 @@
+Persistence:
+
+collection-cron-folder-list.txt
+
+collection-cron-tab-list.txt
+
+collection-service_status.txt
+
+collection-systemctl_service_status.txt
+
+collection-cron-folder.tar.gz
+
+collection-persistence-systemdlist.txt  
+
+collection-systemctl_all.txt
+
+keygen ?
+
+
 1. [Account Creation (User or Root)](#account-creation-user-or-root)
 2. [SSH Keys](#ssh-keys) 
 4. [Cron Jobs](#cron-jobs)
@@ -18,6 +37,8 @@
 19. [Backdooring OpenVPN]
 20. [Rootikits] (#rootikits)
 21. UDEV **to do** (see book)
+22. [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
+23. [Web Shell](#web-shell)
 CHECK PANIX tool for additionnal persistence techniques
 
 
@@ -179,5 +200,16 @@ Config file in /.git/config (global) and in each project in ~/.git/config
 ## PAM
 Check files in /lib64/security/
 
+## GTFOBins Reverse Shell
+See https://gtfobins.github.io/#+shell
 
-[def]: #systemd-timers
+## Web shell
+### Apache Tomcat webserver - vulnerable manager application
+https://github.com/mgeeky/tomcatWarDeployer  
+malicious war file dropped in /webapps/ dir.  
+sh spawned by a java proces
+
+
+
+
+[def]: #systemd-timersw
