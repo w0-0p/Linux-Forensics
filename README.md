@@ -1,7 +1,6 @@
 # Aims
 The aims of this doc are:
-1. Gathering relevant TTPs threat actors can use in Linux and
-   organize them according the MITRE ATT&CK matrix.
+1. Gathering relevant TTPs threat actors can use in Linux (and some mainstream technologies) and organize them according the MITRE ATT&CK matrix.
 2. Documenting how Velociraptor can be used to hunt for these TTPs.
 3. Improve Velociraptor Linux detection with additionnal artifacts.
 
@@ -12,6 +11,8 @@ This doc is based on following sources:
 3. https://www.youtube.com/results?search_query=hal+pomeranz+
 4. https://www.youtube.com/@SandflySecurity
 5. https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_
+6. https://righteousit.com
+7. https://gtfobins.github.io
 
 
 # Recommended Books  
