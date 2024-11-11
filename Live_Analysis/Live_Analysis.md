@@ -1,4 +1,4 @@
-# Indicators of Compromise (IoC) - Manual quick check
+# Indicators of Compromise (IoC) - Manual quick checks
 1. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
 2. [Files and Directories](#files-and-directories)
 3. [System Logs](#system-logs)
@@ -62,13 +62,13 @@ Search for suspicious files, directories and creation/modification timestamps.
 **Useful Velociraptor Artifacts**
 - `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
+- [IDEA]: artifact to detect high entropy files (means the file is encrypted → suspicious)
 
 ## System Logs
 
 
 ************************************************************
 
-# 01 Initial Access
 # 02 Execution
 - 
 - keygen
@@ -369,13 +369,15 @@ For example:
 `no_root_squash`misconfiguration:  
 When `no_root_squash` is enabled, it bypasses root squashing, granting the root user on the client full root-level access to the locally mounted NFS shares from the remote NFS server.
 
-# 12 Impact
+# 12 Useful General Velociraptor Artifacts
+- Linux.Detection.Yara.Process
 
 # 13 Linux Commands - Misc.
 
-# (wip) Live Analysis
+# (wip doc) Live Analysis
 1. Mounting known-good binaries
 2. Using netcat
 3. Using Velociraptor
 4. Dump RAM
+5. Volatility (create profile + analyse dump)
 
