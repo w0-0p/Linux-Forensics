@@ -4,7 +4,7 @@ The aims of this doc are:
 2. Documenting how Velociraptor can be used to hunt for these TTPs.
 3. Improve Velociraptor Linux detection with additionnal artifacts.
 
-# Credits
+# Credits and Resources
 This doc is based on following sources:
 1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale
 2. https://hadess.io/the-art-of-linux-persistence/
@@ -13,6 +13,8 @@ This doc is based on following sources:
 5. https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_
 6. https://righteousit.com
 7. https://gtfobins.github.io
+8. https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/linux-forensics
+9. https://attack.mitre.org/matrices/enterprise/linux/
 
 
 # Recommended Books  

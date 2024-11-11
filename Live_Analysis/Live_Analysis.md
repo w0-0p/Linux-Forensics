@@ -1,3 +1,16 @@
+# 01 Initial Access
+# 02 Execution
+- 
+- keygen
+1. [Remote Code (or Command) Execution (RCE)](#rce)
+2. [excetution of malicious service](#malicious-service)
+
+## RCE
+### CVE-2021-44228 (Log4j)
+
+## Malicious Service
+
+# 03 Persistence
 Persistence:
 
 collection-cron-folder-list.txt
@@ -15,6 +28,8 @@ collection-persistence-systemdlist.txt
 collection-systemctl_all.txt
 
 keygen ?
+
+add image from Computer Forensic class (schema of related techniques)
 
 
 1. [Account Creation (User or Root)](#account-creation-user-or-root)
@@ -35,7 +50,7 @@ keygen ?
 17. [Git Backdooring]
 18. [Config](#config)
 19. [Backdooring OpenVPN]
-20. [Rootikits] (#rootikits)
+20. [Rootkits] (#rootkits)
 21. UDEV **to do** (see book)
 22. [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
 23. [Web Shell](#web-shell)
@@ -213,3 +228,133 @@ sh spawned by a java proces
 
 
 [def]: #systemd-timersw
+
+# 04 Privilege Escalation
+1. [Processes Privilege Escalation](#processes-privilege-escalation)
+2. [Linux Kernel Vulnerability](#linux-kernel-vulnerability)
+3. 
+
+## Processes Privilege Escalation
+**Detection with Velociraptor**  
+Artifact: Exchange.Linux.PrivilegeEscalationDetection
+### CVE-2021-4034
+Polkit vulnerability, with `pkexec` commmand.  
+**Detection with Velociraptor**  
+Artifact: Exchange.Linux.Detection.CVE20214034
+
+## Linux Kernel Vulnerability
+Detection:
+- sunlight?
+- RAM dump
+- Linux Commands (see github repo)
+### CVE-2022-0847 (Dirty Pipe)
+Detection: wget https://github.com/airbus-cert/dirtypipe-ebpf_detection/releases/download/v0.1/dirtypipe_detection
+### CVE-2022-2588
+**Detection with Velociraptor**  
+Search for suspect users (with pwd hash in /etc/passwd)  
+Artifact: Linux.Sys.User
+### CVE-2023-2640
+### CVE-2023-32629
+
+# 05 Defense Evasion
+[Hide File or Directory](#)
+
+- process renaming
+- encoding
+
+## Hide File or Directory
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+##
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+
+# 06 Credential Access
+
+1. [Read /etc/shadow](#read-etcshadow)
+2. [SSH Password Spraying](#ssh-password-spraying)
+3. [SSHD Sniffing with Strace](#sshd-sniffing-with-strace)
+4. [PAM auth() Sniffing with bpftrace](#pam-auth-sniffing-with-bpftrace)
+
+## Read /etc/shadow
+## SSH Password Spraying
+## SSHD Sniffing with Strace
+## PAM auth() Sniffing with bpftrace
+
+# 07 Discovery
+
+# 08 Lateral Movement
+
+## ssh key reuse
+- Command Execution
+Check file:  
+~/.bash_history
+- Logon Sessions
+Check logs:  
+/var/log/auth.log  
+/var/log/btmp
+## Processes
+## Lateral Tool Transfer
+Files can be transferred using native tools, such as scp, rsync, curl, sftp, and ftp. Adversaries may be able to leverage Web Services such as Dropbox or OneDrive to copy files from one machine to another via shared.
+
+# 09 Collection
+
+# 10 Command and Control
+[C2 Implants](#c2-implants)
+2. [Tunneling Tools](#tunneling-tools)
+3. [Process via Proxy Chain](#process-via-proxy-chain)
+4. [Non-standard HTTP/HTTPS Ports](#non-standard-httphttps-ports)
+5. [Reverse Shells](#reverse-shells)
+6. [Upgrade Reverse Shell to PTY Shell](#upgrade-reverse-shell-to-pty-shell)
+
+## C2 Implants  
+## Tunneling Tools
+## Process via Proxy Chain
+## Non-standard HTTP/HTTPS Ports
+## Reverse Shells
+## Upgrade Reverse Shell to PTY Shell
+
+# 11 Exfiltration
+[GTFOBins File Upload](#gtfobins-file-upload)
+2. [Path Traversal](path-traversal)
+3. [Network File Sharing (NFS)](nfs)
+
+## GTFOBins File Upload
+https://gtfobins.github.io/#+file%20upload
+
+## Path Traversal
+For example:   
+`curl -v --path-as-is http://10.7.0.10:8181/icons/.%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd`
+
+## NFS
+`no_root_squash`misconfiguration:  
+When `no_root_squash` is enabled, it bypasses root squashing, granting the root user on the client full root-level access to the locally mounted NFS shares from the remote NFS server.
+
+# 12 Impact
+
+# 13 Linux Commands - Misc.
+
