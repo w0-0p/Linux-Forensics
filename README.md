@@ -1,20 +1,21 @@
 # Aims
 The aims of this doc are:
-1. Gathering relevant TTPs threat actors can use in Linux (and some mainstream technologies) and organize them according the MITRE ATT&CK matrix.
-2. Documenting how Velociraptor can be used to hunt for these TTPs.
-3. Improve Velociraptor Linux detection with additionnal artifacts.
+1. Gather known techniques for compromising Linux systems.
+2. Provide Threat-Hunting guides and procedures, when possible with Velociraptor.
+3. Improve Velociraptor's Linux detection with additionnal or improved artifacts.
 
 # Credits and Resources
 This doc is based on following sources:
 1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale
 2. https://hadess.io/the-art-of-linux-persistence/
-3. https://www.youtube.com/results?search_query=hal+pomeranz+
-4. https://www.youtube.com/@SandflySecurity
-5. https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_
-6. https://righteousit.com
-7. https://gtfobins.github.io
-8. https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/linux-forensics
+3. https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#overview-of-blog-series
+4. https://gtfobins.github.io
+5. https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/linux-forensics
+6. https://www.youtube.com/@SandflySecurity
+7. https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_
+8. https://righteousit.com
 9. https://attack.mitre.org/matrices/enterprise/linux/
+10. https://www.youtube.com/results?search_query=hal+pomeranz+
 
 
 # Recommended Books  

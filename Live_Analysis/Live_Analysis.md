@@ -1,3 +1,73 @@
+# Indicators of Compromise (IoC) - Manual quick check
+1. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
+2. [Files and Directories](#files-and-directories)
+3. [System Logs](#system-logs)
+4. System settings (Network)
+5. Persistence
+6. Privilege escalation
+7. Rootkits
+
+## Users, User Groups and Authentication (SSH)
+**`/etc/passwd`**  
+- new user accounts
+- only `root` can have UID 0
+- suspicious home directories, for example hidden: `/home/.hiddendir`
+- login shell (service users must have `nologin` or `false`)  
+
+**`/etc/group`**  
+- lists groups and members
+
+**Logins**  
+Search for suspicious logins or failed attempts.  
+- `#last`: last successful logins
+- `#lastb`: last failed login
+- `#lastlog`: list last login for all users
+- `#utmpdump /var/run/utmp`: all current logins, check type (0 is not valid)
+- `#utmpdump /var/log/btmp`: raw dump of btmp
+- if login from a service user → check `nologin` or `false` binary integrity
+
+**SSH Keys**  
+Check for suspicious authorized keys, unprotected private keys, suspicous SSH configs, suspicious creation/modification timestamps.  
+- `/home/<username>/.ssh/authorized_keys`: authorized keys file
+- `/home/<username>/.ssh` or `/etc/ssh/`: private keys
+- `/etc/ssh/sshd_config`: ssh server config
+- if a private key is not encrypted → recommended to revoque it
+
+**Useful Velociraptor Artifacts**
+- `Linux.Sys.Users`: retrieve Users
+- `Linux.Users.RootUsers`: retrieve Users in *sudo* Group
+- `Linux.Sys.LastUserLogin`: retrieve wtmp file content (successful logins and logouts)
+- `Linux.Users.InteractiveUsers`: retrieve the interactive users (shell login)
+- `Linux.Ssh.AuthorizedKeys`: retrieve authorized SSH keys
+- `Linux.Ssh.PrivateKeys`: retrieve private keys + checks if encrypted or not
+
+## Files and Directories
+Search for suspicious files, directories and creation/modification timestamps.
+- suspicious Directories:  
+  - tries to look like a system directory
+  - hidden in system areas
+  - weird permissions, attributes (immutable?), timestamp
+  - comparison with duplicate VM does not match
+- suspicious Files:
+  - displayed type (name) not matching real file type
+  - modified system binary
+  - binary in strange location
+- hidden files or directories starting with `.`, `..`, `...`
+- `#lsattr`: list attributes of a File or Dir (see if immutable flag is set)
+- `#strings /path/to/bianary`: search for suspicious content like `listen()`, `bind()` and/or `accept()`, IP addresses, etc.
+- `#find /<dir> -perm 4000`: look for suspicious *setuid* files
+- `#find -nouser` `#find -nogroup`: files without assigned UID/GID (may indicate deleted user/group)
+- `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files).
+
+**Useful Velociraptor Artifacts**
+- `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
+- `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
+
+## System Logs
+
+
+************************************************************
+
 # 01 Initial Access
 # 02 Execution
 - 
@@ -54,53 +124,11 @@ add image from Computer Forensic class (schema of related techniques)
 21. UDEV **to do** (see book)
 22. [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
 23. [Web Shell](#web-shell)
+24. Modified system binaries (false)
 CHECK PANIX tool for additionnal persistence techniques
 
 
-## Account Creation (User or Root)
 
-### Check passwd file.
-Ubuntu, Debian, CentOS, Fedora:
-/etc/passwd
-
-FreeBSD:
-/etc/master.passwd
-
-#### Check it with Velociraptor
-Default artifact: Linux.Sys.Users
-
-### Post-process Notebook query (example)
-```sql
-/*
-# Linux.Sys.Users
-*/
-SELECT * FROM source(artifact="Linux.Sys.Users")
-WHERE NOT Shell =~ "nologin"
-and NOT Shell =~"false"
-LIMIT 50
-```
-
-## SSH Keys
-
-### Authorized Keys
-
-Check authorized_keys file.
-
-/home/\<username>/.ssh/authorized_keys
-
-#### Check it with Velociraptor:
-Default artifact: Linux.Ssh.AuthorizedKeys
-
-### Private Keys
-
-Check if private keys are encrypted in directory.
---> if not encrypted, it is recommended to revoque 
-these private keys.
-
-/home/\<username>/.ssh
-
-#### Check it with Velociraptor:
-Default artifact: Linux.Ssh.PrivateKeys
 
 ## Cron Jobs
 
@@ -132,19 +160,6 @@ Check timer files:
 #### Check it with Velociraptor:
 
 Default artifact: Linux.Sys.Services
-
-### Custom Notebook query
-```sql
-/*
-# System Timers
-*/
-LET services = SELECT Stdout FROM execve(argv=['systemctl', 'list-units',  '--type=timer'])
-
-LET all_services = SELECT grok(grok="%{NOTSPACE:Unit}%{SPACE}%{NOTSPACE:Load}%{SPACE}%{NOTSPACE:Active}%{SPACE}%{NOTSPACE:Sub}%{SPACE}%{GREEDYDATA:Description}", data=Line) AS Parsed
-FROM parse_lines(accessor="data", filename=services.Stdout)
-
-SELECT * FROM foreach(row=all_services, column="Parsed") WHERE Unit =~ ".timer"
-```
 
 ## Shell Configuration Modification
 
@@ -357,4 +372,10 @@ When `no_root_squash` is enabled, it bypasses root squashing, granting the root 
 # 12 Impact
 
 # 13 Linux Commands - Misc.
+
+# (wip) Live Analysis
+1. Mounting known-good binaries
+2. Using netcat
+3. Using Velociraptor
+4. Dump RAM
 
