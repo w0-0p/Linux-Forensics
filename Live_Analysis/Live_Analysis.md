@@ -1,18 +1,22 @@
 # Indicators of Compromise (IoC) - Manual quick checks
 1. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
-2. [Files and Directories](#files-and-directories)
+2. [Files, Directories and Binaries](#files-directories-and-binaries)
 3. [System Logs](#system-logs)
-4. System settings (Network)
-5. Persistence
-6. Privilege escalation
-7. Rootkits
+4. [System Settings](#system-settings)
+5. [Persistence, overview](#persistence-overview)
+6. [Privilege Escalation, overview](#privilege-escalation-overview)
+7. [Rootkits, overview](#rootkits-overview)
+- Shells
+- Usefull Velociraptor artifacts
+- Processes
 
 ## Users, User Groups and Authentication (SSH)
-**`/etc/passwd`**  
+**`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
 - only `root` can have UID 0
-- suspicious home directories, for example hidden: `/home/.hiddendir`
+- suspicious home directories, for example hidden: `~/.hiddendir`
 - login shell (service users must have `nologin` or `false`)  
+- check for password hashes inside `/etc/shadow` for users without a shell
 
 **`/etc/group`**  
 - lists groups and members
@@ -23,14 +27,15 @@ Search for suspicious logins or failed attempts.
 - `#lastb`: last failed login
 - `#lastlog`: list last login for all users
 - `#utmpdump /var/run/utmp`: all current logins, check type (0 is not valid)
-- `#utmpdump /var/log/btmp`: raw dump of btmp
+- `#utmpdump /var/log/btmp`: raw dump of btmp (possible to find pw, if a user accidentaly typed pw at the user login prompt)
 - if login from a service user → check `nologin` or `false` binary integrity
 
 **SSH Keys**  
 Check for suspicious authorized keys, unprotected private keys, suspicous SSH configs, suspicious creation/modification timestamps.  
-- `/home/<username>/.ssh/authorized_keys`: authorized keys file
-- `/home/<username>/.ssh` or `/etc/ssh/`: private keys
-- `/etc/ssh/sshd_config`: ssh server config
+- `~/.ssh/`: private keys
+- `~/.ssh/authorized_keys`: authorized keys file (check for user email address)
+- `~/.ssh/known_hosts`: list of hosts accessed previously
+- `/etc/ssh/ssh_config`, `/etc/ssh/ssh_config.d`, `~/.ssh/config`: ssh client config
 - if a private key is not encrypted → recommended to revoque it
 
 **Useful Velociraptor Artifacts**
@@ -41,7 +46,7 @@ Check for suspicious authorized keys, unprotected private keys, suspicous SSH co
 - `Linux.Ssh.AuthorizedKeys`: retrieve authorized SSH keys
 - `Linux.Ssh.PrivateKeys`: retrieve private keys + checks if encrypted or not
 
-## Files and Directories
+## Files, Directories and Binaries
 Search for suspicious files, directories and creation/modification timestamps.
 - suspicious Directories:  
   - tries to look like a system directory
@@ -52,8 +57,13 @@ Search for suspicious files, directories and creation/modification timestamps.
   - displayed type (name) not matching real file type
   - modified system binary
   - binary in strange location
+  - high entropy (file is encrypted)
 - hidden files or directories starting with `.`, `..`, `...`
+- `#ls -lap`: lists element with a / at the end (allows to see empty spaces)
 - `#lsattr`: list attributes of a File or Dir (see if immutable flag is set)
+- `#file /path/to/file`: basic file summary
+- `#ldd /path/to/binary`: **! never run on a suspicious binary (could execute malicious code) !** lists shared objects
+- `#objdump -p /path/to/binary | grep NEEDED`: lists required shared objects
 - `#strings /path/to/bianary`: search for suspicious content like `listen()`, `bind()` and/or `accept()`, IP addresses, etc.
 - `#find /<dir> -perm 4000`: look for suspicious *setuid* files
 - `#find -nouser` `#find -nogroup`: files without assigned UID/GID (may indicate deleted user/group)
@@ -66,71 +76,80 @@ Search for suspicious files, directories and creation/modification timestamps.
 
 ## System Logs
 
+## System Settings
 
-************************************************************
+## Persistence, overview
+![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
+### Persistence techniques (non exhaustive list)
+#### User Accounts, Authentication
+1. User Accounts and Groups  
+[See](#users-user-groups-and-authentication-ssh)
+2. SSH Keys  
+[See](#users-user-groups-and-authentication-ssh)
+3. MOTD Backdooring  
+Message of the day (MOTD) is a message presented to a user when he/she connects via SSH or a serial connection.
+If activated, MOTD scripts are executed as `root` every time a user connects to a Linux system.
+These scripts can be modified to gain persistence.
+Config files in `/etc/update-motd.d/`
+#### Startup, Jobs, Crons, Timers, Automated actions, Systemd
+1. rc.common/rc.local
+2. At job (one time jobs)  
+Config files in `/var/spool/cron/atjobs/`  
+Job detail in `/var/spool/cron/atspool/`  
+3. Cron Job (recuring jobs)  
+User-specifc cron job settings:  
+`/var/spool/cron/`, `/var/spool/cron/crontabs/`  
+System-wide cron job settings:  
+`/etc/crontab`, `/etc/cron.d/`, `/etc/cron.daily/`, `/etc/cron.hourly/`, `/etc/cron.monthly/`, `/etc/cron.weekly/`  
+4. Systemd Services and Timers  
+Systemd generator
+Systemd service
+5. UDEV **to do** (see book)
+SysV Init (init.d) persistence ?
+XDG Autostart?
+#### System tools and configs
+1. [Shell Configuration Modification](#shell-configuration-modification)
+2. [Dynamic Linker Hijacking](#dynamic-linker) (check if correct here)
+3. [Shared object Library](#shared-object-library) (check if correct here)
+4. [Startup file](#startup-file)
+5. [SUID](#suid) (check if correct here)
+6. [System Call](#system-call)
+7. Hooks [APT Backdooring]
+8 . Shells? (Bind shell in the background; Shell profile)
+9. Capabilities?
+10. Hooks (Git, DPKG/RPM)
+11. Packet managers (APT/YUM/DNF)
+12. System binary wrapping for persistence ?
+#### Living of the Land Binaries
+1. GTFOBins [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
+2. Modified system binaries (false)
+3. Docker container with host escape
 
-# 02 Execution
-- 
-- keygen
-1. [Remote Code (or Command) Execution (RCE)](#rce)
-2. [excetution of malicious service](#malicious-service)
+#### Third party tools, scripts
+1. [Trap](#trap)
+The trap command can catch signals and execute a specified command or set of commands when a signal is received.
+Common signals include SIGINT (interrupt, typically sent by pressing Ctrl+C), SIGTERM (termination signal), and EXIT
+(when the script exits normally or through one of the signals).
+2. Hooks [Git Backdooring]
 
-## RCE
-### CVE-2021-44228 (Log4j)
-
-## Malicious Service
-
-# 03 Persistence
-Persistence:
-
-collection-cron-folder-list.txt
-
-collection-cron-tab-list.txt
-
-collection-service_status.txt
-
-collection-systemctl_service_status.txt
-
-collection-cron-folder.tar.gz
-
-collection-persistence-systemdlist.txt  
-
-collection-systemctl_all.txt
-
-keygen ?
-
-add image from Computer Forensic class (schema of related techniques)
+#### Rootkits, User-Space and Kernel-Space
+[Rootkits] (#rootkits) 
 
 
-1. [Account Creation (User or Root)](#account-creation-user-or-root)
-2. [SSH Keys](#ssh-keys) 
-4. [Cron Jobs](#cron-jobs)
-5. [Systemd Services and Timers](#systemd-services-and-timers)
-6. [Shell Configuration Modification](#shell-configuration-modification)
-7. [Dynamic Linker Hijacking](#dynamic-linker)
-8. [Shared object Library](#shared-object-library)
-9. [SUID](#suid)
-10. [rc.common/rc.local]
-11. [Systemd Services](#systemd-services)
-12. [Trap](#trap)
-13. [Startup file](#startup-file)
-14. [System Call](#system-call)
-15. [MOTD Backdooring]
-16. [APT Backdooring]
-17. [Git Backdooring]
-18. [Config](#config)
-19. [Backdooring OpenVPN]
-20. [Rootkits] (#rootkits)
-21. UDEV **to do** (see book)
-22. [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
-23. [Web Shell](#web-shell)
-24. Modified system binaries (false)
+17. environment variables and can be set to execute arbitrary commands whenever an action is about to take place like git log and its respective environment variable, GIT_PAGER
+23. [Web Shell](#web-shell) (webserver dir)
 CHECK PANIX tool for additionnal persistence techniques
 
+** . Cron Jobs**  
+collection-cron-folder-list.txt
+collection-cron-tab-list.txt
+collection-service_status.txt
+collection-systemctl_service_status.txt
+collection-cron-folder.tar.gz
+collection-persistence-systemdlist.txt  
+collection-systemctl_all.txt
 
 
-
-## Cron Jobs
 
 Check cron tab files.
 
@@ -160,24 +179,6 @@ Check timer files:
 #### Check it with Velociraptor:
 
 Default artifact: Linux.Sys.Services
-
-## Shell Configuration Modification
-
-| Files | Working |
-|-------|---------|
-| /etc/bash.bashrc | systemwide files executed at the start of interactive shell |
-| /etc/bash_logout | Systemwide files executed when we terminate the shell |
-| ~/.bashrc	| Widly exploited user specific startup script executed at the start of shell |
-| ~/.bash_profile, ~/.bash_login, ~/.profile | User specific files , but which found first are executed first |
-| ~.bash_logout | User specific files, executed when shell session closes |
-| ~/.bash_logout | User-specific clean up script at the end of the session |
-| /etc/profile | Systemwide files executed at the start of login shells |
-| /etc/profile.d | all the .sh files are executed at the start of login shells |
-
-#### Check it with Velociraptor:
-
-Inspect Bash logout files: Linux.System.BashLogout
-Search for files: Linux.Search.FileFinder
 
 ## Shared object Library
 To Check:
@@ -244,7 +245,8 @@ sh spawned by a java proces
 
 [def]: #systemd-timersw
 
-# 04 Privilege Escalation
+
+## Privilege Escalation, overview
 1. [Processes Privilege Escalation](#processes-privilege-escalation)
 2. [Linux Kernel Vulnerability](#linux-kernel-vulnerability)
 3. 
@@ -256,6 +258,41 @@ Artifact: Exchange.Linux.PrivilegeEscalationDetection
 Polkit vulnerability, with `pkexec` commmand.  
 **Detection with Velociraptor**  
 Artifact: Exchange.Linux.Detection.CVE20214034
+
+
+## Rootkits, overview
+
+## Shell
+keygen command (lateral movement)
+
+
+************************************************************
+
+
+## Malicious Service
+
+# 03 Persistence
+
+## Shell Configuration Modification
+
+| Files | Working |
+|-------|---------|
+| /etc/bash.bashrc | systemwide files executed at the start of interactive shell |
+| /etc/bash_logout | Systemwide files executed when we terminate the shell |
+| ~/.bashrc	| Widly exploited user specific startup script executed at the start of shell |
+| ~/.bash_profile, ~/.bash_login, ~/.profile | User specific files , but which found first are executed first |
+| ~.bash_logout | User specific files, executed when shell session closes |
+| ~/.bash_logout | User-specific clean up script at the end of the session |
+| /etc/profile | Systemwide files executed at the start of login shells |
+| /etc/profile.d | all the .sh files are executed at the start of login shells |
+
+#### Check it with Velociraptor:
+
+Inspect Bash logout files: Linux.System.BashLogout
+Search for files: Linux.Search.FileFinder
+
+
+# 04 Privilege Escalation
 
 ## Linux Kernel Vulnerability
 Detection:
@@ -371,6 +408,13 @@ When `no_root_squash` is enabled, it bypasses root squashing, granting the root 
 
 # 12 Useful General Velociraptor Artifacts
 - Linux.Detection.Yara.Process
+
+To Do:
+- test artifact in other distro:
+   - Linux.Collection.CatScale
+   - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
+- create artifact for Shell Configuration files
+- test ssh bruteforce and check logs
 
 # 13 Linux Commands - Misc.
 

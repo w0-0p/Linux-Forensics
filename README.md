@@ -16,15 +16,10 @@ This doc is based on following sources:
 8. https://righteousit.com
 9. https://attack.mitre.org/matrices/enterprise/linux/
 10. https://www.youtube.com/results?search_query=hal+pomeranz+
+11. https://github.com/Aegrah/PANIX
 
 
-# Recommended Books  
+# Recommended Books 
 - Practical Linux Forensics, Bruce Nikkel  
 - Linux Forensics, Philip Polstra  
-
-To Do:
-- test artifact in other distro:
-   - Linux.Collection.CatScale
-   - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
-- create artifact for Shell Configuration files
-- test ssh bruteforce and check logs
+- The Linux Programming Interface, Michael Kerrisk
