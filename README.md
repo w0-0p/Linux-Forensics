@@ -17,6 +17,8 @@ This doc is based on following sources:
 9. https://attack.mitre.org/matrices/enterprise/linux/
 10. https://www.youtube.com/results?search_query=hal+pomeranz+
 11. https://github.com/Aegrah/PANIX
+12. https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms
+13. https://github.com/elastic/detection-rules/tree/main/hunting/linux/docs
 
 
 # Recommended Books 

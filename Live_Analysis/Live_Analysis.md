@@ -3,12 +3,12 @@
 2. [Files, Directories and Binaries](#files-directories-and-binaries)
 3. [System Logs](#system-logs)
 4. [System Settings](#system-settings)
-5. [Persistence, overview](#persistence-overview)
-6. [Privilege Escalation, overview](#privilege-escalation-overview)
-7. [Rootkits, overview](#rootkits-overview)
+5. [Processes](#processes)
+6. [Persistence, overview](#persistence-overview)
+7. [Privilege Escalation, overview](#privilege-escalation-overview)
+8. [Rootkits, overview](#rootkits-overview)
 - Shells
 - Usefull Velociraptor artifacts
-- Processes
 
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
@@ -59,6 +59,7 @@ Search for suspicious files, directories and creation/modification timestamps.
   - binary in strange location
   - high entropy (file is encrypted)
 - hidden files or directories starting with `.`, `..`, `...`
+- `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files)
 - `#ls -lap`: lists element with a / at the end (allows to see empty spaces)
 - `#lsattr`: list attributes of a File or Dir (see if immutable flag is set)
 - `#file /path/to/file`: basic file summary
@@ -67,7 +68,6 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `#strings /path/to/bianary`: search for suspicious content like `listen()`, `bind()` and/or `accept()`, IP addresses, etc.
 - `#find /<dir> -perm 4000`: look for suspicious *setuid* files
 - `#find -nouser` `#find -nogroup`: files without assigned UID/GID (may indicate deleted user/group)
-- `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files).
 
 **Useful Velociraptor Artifacts**
 - `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
@@ -82,31 +82,63 @@ Search for suspicious files, directories and creation/modification timestamps.
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
 #### User Accounts, Authentication
-1. User Accounts and Groups  
+1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
-2. SSH Keys  
+2. **SSH Keys**  
 [See](#users-user-groups-and-authentication-ssh)
-3. MOTD Backdooring  
+3. **MOTD**  
 Message of the day (MOTD) is a message presented to a user when he/she connects via SSH or a serial connection.
 If activated, MOTD scripts are executed as `root` every time a user connects to a Linux system.
 These scripts can be modified to gain persistence.
 Config files in `/etc/update-motd.d/`
-#### Startup, Jobs, Crons, Timers, Automated actions, Systemd
-1. rc.common/rc.local
-2. At job (one time jobs)  
+#### System boot: Sytem V, Upstart, Systemd, Run Control
+Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
+1. **System V (SysV)**  
+Older init system.  
+Startup, running and shutdown scripts in `/etc/init.d/` and executed as `root` on boot.  
+Scripts are often linked to runlevel directories, determining when they are run: `/etc/rc0.d/`, `/etc/rc1.d/`,`/etc/rc2.d/`, etc.  
+2. **Upstart**  
+Older init system.
+System-wide scripts in `/etc/init/`.  
+User-session mode scripts in `~/.config/upstart/`, `~/.init/`,`/etc/xdg/upstart/`,`/usr/share/upstart/sessions/`.
+3. **Systemd**  
+System ans service manager for Linux, replacement for SysVinit. Systemd operates with `unit files`, defing how services are started, stopped or managed.  
+There are different types of `unit files`: Service (for managing long-running processes - typically deamons), Timer (similar to cron jobs).  
+- **Systemd Services**  
+System-wide services: `/run/systemd/system/`, `/etc/systemd/system/`, `/etc/systemd/user/`, `/usr/local/lib/systemd/system/`, `/lib/systemd/system/`, `/usr/lib/systemd/system/`, `/usr/lib/systemd/user/`  
+User-specific services: `~/.config/systemd/user/`, `~/.local/share/systemd/user/`
+- **Systemd Timers**  
+Each `.timer`file must have a corresponding `.service` file with the same name.
+System-wide timers: `/etc/systemd/system/`, `/usr/lib/systemd/system`,
+User-specific timers: `~/.config/systemd/`  
+- **Systemd Generator**  
+`systemd-rc-local-generator`, `rc-local.service`: Compatibility generator and service to start `/etc/rc.local` during boot.
+4. **rc.common, rc.local**  
+Config file `/etc/rc.local`
+#### Jobs, Crons, Timers, Automated actions  
+1. **At job** (one time jobs)  
 Config files in `/var/spool/cron/atjobs/`  
 Job detail in `/var/spool/cron/atspool/`  
-3. Cron Job (recuring jobs)  
+2. **Cron Job** (recuring jobs)  
 User-specifc cron job settings:  
 `/var/spool/cron/`, `/var/spool/cron/crontabs/`  
 System-wide cron job settings:  
 `/etc/crontab`, `/etc/cron.d/`, `/etc/cron.daily/`, `/etc/cron.hourly/`, `/etc/cron.monthly/`, `/etc/cron.weekly/`  
-4. Systemd Services and Timers  
-Systemd generator
-Systemd service
-5. UDEV **to do** (see book)
-SysV Init (init.d) persistence ?
-XDG Autostart?
+3. **UDEV**  
+Device manager for the Linux kernel. When a device is added to the system (USB drive, keyboard or network interface, etc) UDEV triggers predefined actions (rules).  
+These rules can be created or manipulated to gain persistence.
+UDEV rule files in:  
+`/etc/udev/rules.d/`, `/run/udev/rules.d/`, `/usr/lib/udev/rules.d/`, `/usr/local/lib/udev/rules.d/`, `/lib/udev/`
+4. 
+
+Honorable mentions for establishing persistence through scheduled tasks/jobs include Anacron, Fcron, Task Spooler, and Batch.
+
+
+- XDG Autostart?
+- "IMFRS" 
+
+
+
 #### System tools and configs
 1. [Shell Configuration Modification](#shell-configuration-modification)
 2. [Dynamic Linker Hijacking](#dynamic-linker) (check if correct here)
