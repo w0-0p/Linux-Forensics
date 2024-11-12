@@ -1,15 +1,16 @@
 # Indicators of Compromise (IoC) - Manual quick checks
-1. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
-2. [Files, Directories and Binaries](#files-directories-and-binaries)
-3. [System Logs](#system-logs)
-4. [System Settings](#system-settings)
-5. [Processes](#processes)
-6. [Persistence, overview](#persistence-overview)
-7. [Privilege Escalation, overview](#privilege-escalation-overview)
-8. [Rootkits, overview](#rootkits-overview)
+1. [System Infos and Settings](#system-info-and-settings)
+. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
+. [Files, Directories and Binaries](#files-directories-and-binaries)
+. [System Logs](#system-logs)
+. [Processes](#processes)
+. [Persistence, overview](#persistence-overview)
+. [Privilege Escalation, overview](#privilege-escalation-overview)
+. [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
+. [Useful Linux Commands](#useful-linux-commands)
 - Shells
-- Usefull Velociraptor artifacts
 
+## System Infos and Settings
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
@@ -45,7 +46,6 @@ Check for suspicious authorized keys, unprotected private keys, suspicous SSH co
 - `Linux.Users.InteractiveUsers`: retrieve the interactive users (shell login)
 - `Linux.Ssh.AuthorizedKeys`: retrieve authorized SSH keys
 - `Linux.Ssh.PrivateKeys`: retrieve private keys + checks if encrypted or not
-
 ## Files, Directories and Binaries
 Search for suspicious files, directories and creation/modification timestamps.
 - suspicious Directories:  
@@ -73,11 +73,8 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
 - [IDEA]: artifact to detect high entropy files (means the file is encrypted → suspicious)
-
 ## System Logs
-
-## System Settings
-
+## Processes
 ## Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
@@ -91,6 +88,11 @@ Message of the day (MOTD) is a message presented to a user when he/she connects 
 If activated, MOTD scripts are executed as `root` every time a user connects to a Linux system.
 These scripts can be modified to gain persistence.
 Config files in `/etc/update-motd.d/`
+4. **XDG Autostart**  
+XDG Autostart entries can be used to execute arbitrary commands or scripts when a user logs in.  
+System-wide configs: `/etc/xdg/autostart/`, `/usr/share/autostart/`  
+User-specific configs: `~/.config/autostart/`, `~/.local/share/autostart/`, `~/.config/autostart-scripts/`  
+Root-specific configs: `/root/.config/autostart/`, `/root/.local/share/autostart/`, `/root/.config/autostart-scripts/`  
 #### System boot: Sytem V, Upstart, Systemd, Run Control
 Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
 1. **System V (SysV)**  
@@ -103,7 +105,7 @@ System-wide scripts in `/etc/init/`.
 User-session mode scripts in `~/.config/upstart/`, `~/.init/`,`/etc/xdg/upstart/`,`/usr/share/upstart/sessions/`.
 3. **Systemd**  
 System ans service manager for Linux, replacement for SysVinit. Systemd operates with `unit files`, defing how services are started, stopped or managed.  
-There are different types of `unit files`: Service (for managing long-running processes - typically deamons), Timer (similar to cron jobs).  
+There are different types of `unit files`: `Service` (for managing long-running processes - typically deamons), `Timer` (similar to cron jobs).  
 - **Systemd Services**  
 System-wide services: `/run/systemd/system/`, `/etc/systemd/system/`, `/etc/systemd/user/`, `/usr/local/lib/systemd/system/`, `/lib/systemd/system/`, `/usr/lib/systemd/system/`, `/usr/lib/systemd/user/`  
 User-specific services: `~/.config/systemd/user/`, `~/.local/share/systemd/user/`
@@ -112,9 +114,12 @@ Each `.timer`file must have a corresponding `.service` file with the same name.
 System-wide timers: `/etc/systemd/system/`, `/usr/lib/systemd/system`,
 User-specific timers: `~/.config/systemd/`  
 - **Systemd Generator**  
+System-wide generators: `/etc/systemd/system-generators/`. `/usr/local/lib/systemd/system-generators/`. `/lib/systemd/system-generators/`. `/etc/systemd/user-generators/`. `/usr/local/lib/systemd/user-generators/`. `/usr/lib/systemd/user-generators/`  
 `systemd-rc-local-generator`, `rc-local.service`: Compatibility generator and service to start `/etc/rc.local` during boot.
 4. **rc.common, rc.local**  
 Config file `/etc/rc.local`
+
+Default artifact: Linux.Sys.Services
 #### Jobs, Crons, Timers, Automated actions  
 1. **At job** (one time jobs)  
 Config files in `/var/spool/cron/atjobs/`  
@@ -129,16 +134,10 @@ Device manager for the Linux kernel. When a device is added to the system (USB d
 These rules can be created or manipulated to gain persistence.
 UDEV rule files in:  
 `/etc/udev/rules.d/`, `/run/udev/rules.d/`, `/usr/lib/udev/rules.d/`, `/usr/local/lib/udev/rules.d/`, `/lib/udev/`
-4. 
+5. Additionnal persistence mechanisms: `Anacron`, `Fcron`, `Task Spooler`, `Batch`.
 
-Honorable mentions for establishing persistence through scheduled tasks/jobs include Anacron, Fcron, Task Spooler, and Batch.
-
-
-- XDG Autostart?
-- "IMFRS" 
-
-
-
+Default artifact: Linux.Sys.Crontab
+Or with custom artifact: Linux.Collection.Autoruns
 #### System tools and configs
 1. [Shell Configuration Modification](#shell-configuration-modification)
 2. [Dynamic Linker Hijacking](#dynamic-linker) (check if correct here)
@@ -156,61 +155,33 @@ Honorable mentions for establishing persistence through scheduled tasks/jobs inc
 1. GTFOBins [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
 2. Modified system binaries (false)
 3. Docker container with host escape
-
 #### Third party tools, scripts
 1. [Trap](#trap)
 The trap command can catch signals and execute a specified command or set of commands when a signal is received.
 Common signals include SIGINT (interrupt, typically sent by pressing Ctrl+C), SIGTERM (termination signal), and EXIT
 (when the script exits normally or through one of the signals).
 2. Hooks [Git Backdooring]
-
 #### Rootkits, User-Space and Kernel-Space
 [Rootkits] (#rootkits) 
+"initramfs"  
+## Privilege Escalation, overview
+## Useful Velociraptor Artifacts
+- Linux.Detection.Yara.Process
+- Linux.Search.FileFinder
 
+To Do:
+- test artifact in other distro:
+   - Linux.Collection.CatScale
+   - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
+- create artifact for Shell Configuration files
+- test ssh bruteforce and check logs
+## Useful Linux Commands
 
-17. environment variables and can be set to execute arbitrary commands whenever an action is about to take place like git log and its respective environment variable, GIT_PAGER
-23. [Web Shell](#web-shell) (webserver dir)
-CHECK PANIX tool for additionnal persistence techniques
+## ++++++++++++++++++++++++++++Clean END++++++++++++++++++++++++++++++++++++++++++++++++++
+- environment variables and can be set to execute arbitrary commands whenever an action is about to take place like git log and its
+- respective environment variable, GIT_PAGER
+- [Web Shell](#web-shell) (webserver dir)
 
-** . Cron Jobs**  
-collection-cron-folder-list.txt
-collection-cron-tab-list.txt
-collection-service_status.txt
-collection-systemctl_service_status.txt
-collection-cron-folder.tar.gz
-collection-persistence-systemdlist.txt  
-collection-systemctl_all.txt
-
-
-
-Check cron tab files.
-
-System-level:
-- /etc/crontab
-- /etc/cron.d/*
-- /etc/cron.{hourly,daily,weekly,monthly}/*
-- /var/spool/cron/crontab/*
-
-User-level:
-- ~/var/spool/cron/crontabs/
-
-#### Check it with Velociraptor:
-
-Default artifact: Linux.Sys.Crontab
-Or with custom artifact: Linux.Collection.Autoruns
-
-## Systemd Services and Timers
-Creating a Custom systemd Service for persistence.
-
-Check service files: 
-/etc/systemd/system/*.service
-
-Check timer files:
-/etc/systemd/system/*.timer
-
-#### Check it with Velociraptor:
-
-Default artifact: Linux.Sys.Services
 
 ## Shared object Library
 To Check:
@@ -219,37 +190,8 @@ To Check:
 - Otherwise, inspect individual processes
 - Use tools like chkrootkit and rkhunter to scan for rootkits and suspicious files.
 
-## SUID
-#### Check it with Velociraptor:
-Linux.Sys.SUID
-Linux.Detection.AnomalousFiles
-Exchange.Linux.Detection.IncorrectPermissions
-
-## rc.common
-Execute a command at the end of the boot process.
-To check: File /etc/rc.local
-#### Check it with Velociraptor:
-Linux.Search.FileFinder
-
 ## Startup file
 Commonly targeted files include ~/.bashrc, ~/.profile, or ~/.bash_profile
-
-System-wide
-Check /etc/init.d/, /etc/rc.d/, /etc/systemd/system/
-
-User-specific
-Check ~/.config/autostart/, ~/.config/ (under various subdirectories)
-
-## System Call
-### Use Emulate/Implement System Call in User-Space
-To Do
-### Alternate System Calls
-To Do
-### Fudging Around Parameters
-To Do
-
-## MOTD Backdooring
-File in /etc/update-motd.d/
 
 ## APT Backdooring
 APT hook files in /etc/apt/apt.conf.d/
@@ -272,16 +214,9 @@ https://github.com/mgeeky/tomcatWarDeployer
 malicious war file dropped in /webapps/ dir.  
 sh spawned by a java proces
 
-
-
-
-[def]: #systemd-timersw
-
-
 ## Privilege Escalation, overview
 1. [Processes Privilege Escalation](#processes-privilege-escalation)
 2. [Linux Kernel Vulnerability](#linux-kernel-vulnerability)
-3. 
 
 ## Processes Privilege Escalation
 **Detection with Velociraptor**  
@@ -292,19 +227,12 @@ Polkit vulnerability, with `pkexec` commmand.
 Artifact: Exchange.Linux.Detection.CVE20214034
 
 
-## Rootkits, overview
 
 ## Shell
 keygen command (lateral movement)
 
 
 ************************************************************
-
-
-## Malicious Service
-
-# 03 Persistence
-
 ## Shell Configuration Modification
 
 | Files | Working |
@@ -349,33 +277,6 @@ Artifact: Linux.Sys.User
 ## Hide File or Directory
 ## 
 ## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-##
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
 
 # 06 Credential Access
 
@@ -384,15 +285,9 @@ Artifact: Linux.Sys.User
 3. [SSHD Sniffing with Strace](#sshd-sniffing-with-strace)
 4. [PAM auth() Sniffing with bpftrace](#pam-auth-sniffing-with-bpftrace)
 
-## Read /etc/shadow
-## SSH Password Spraying
-## SSHD Sniffing with Strace
 ## PAM auth() Sniffing with bpftrace
 
-# 07 Discovery
-
 # 08 Lateral Movement
-
 ## ssh key reuse
 - Command Execution
 Check file:  
@@ -437,18 +332,6 @@ For example:
 ## NFS
 `no_root_squash`misconfiguration:  
 When `no_root_squash` is enabled, it bypasses root squashing, granting the root user on the client full root-level access to the locally mounted NFS shares from the remote NFS server.
-
-# 12 Useful General Velociraptor Artifacts
-- Linux.Detection.Yara.Process
-
-To Do:
-- test artifact in other distro:
-   - Linux.Collection.CatScale
-   - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
-- create artifact for Shell Configuration files
-- test ssh bruteforce and check logs
-
-# 13 Linux Commands - Misc.
 
 # (wip doc) Live Analysis
 1. Mounting known-good binaries
