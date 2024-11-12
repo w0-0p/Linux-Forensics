@@ -1,4 +1,4 @@
-# Indicators of Compromise (IoC) - Manual quick checks
+# Linux Live Analysis Knowledge Base, Tips & Tricks
 1. [System Infos and Settings](#system-info-and-settings)
 . [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
 . [Files, Directories and Binaries](#files-directories-and-binaries)
@@ -14,7 +14,7 @@
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
-- only `root` can have UID 0
+- only `root` should have UID 0
 - suspicious home directories, for example hidden: `~/.hiddendir`
 - login shell (service users must have `nologin` or `false`)  
 - check for password hashes inside `/etc/shadow` for users without a shell
@@ -63,7 +63,7 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `#ls -lap`: lists element with a / at the end (allows to see empty spaces)
 - `#lsattr`: list attributes of a File or Dir (see if immutable flag is set)
 - `#file /path/to/file`: basic file summary
-- `#ldd /path/to/binary`: **! never run on a suspicious binary (could execute malicious code) !** lists shared objects
+- `#ldd /path/to/binary`: **! never run `ldd` on a suspicious binary (could execute malicious code) !** lists shared objects
 - `#objdump -p /path/to/binary | grep NEEDED`: lists required shared objects
 - `#strings /path/to/bianary`: search for suspicious content like `listen()`, `bind()` and/or `accept()`, IP addresses, etc.
 - `#find /<dir> -perm 4000`: look for suspicious *setuid* files
@@ -73,11 +73,43 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
 - [IDEA]: artifact to detect high entropy files (means the file is encrypted → suspicious)
-## System Logs
+## System Logs  
+Sysmon for Linux:  
+- not maintained, not suitable for production
+- alternatives for Linux: ebpf, auditd
 ## Processes
 ## Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
+#### System boot: Sytem V, Upstart, Systemd, Run Control
+Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
+1. **System V (SysV)**  
+Older init system.  
+Startup, running and shutdown scripts in `/etc/init.d/` and executed as `root` on boot.  
+Scripts are often linked to runlevel directories, determining when they are run: `/etc/rc0.d/`, `/etc/rc1.d/`,`/etc/rc2.d/`, etc.  
+2. **Upstart**  
+Older init system.  
+System-wide scripts in `/etc/init/`.  
+User-session mode scripts in `~/.config/upstart/`, `~/.init/`,`/etc/xdg/upstart/`,`/usr/share/upstart/sessions/`.
+3. **Systemd**  
+System ans service manager for Linux, replacement for SysVinit. Systemd operates with `unit files`, defing how services are started, stopped or managed.  
+There are different types of `unit files`: `Service` (for managing long-running processes - typically deamons), `Timer` (similar to cron jobs).  
+- **Systemd Services**  
+System-wide services: `/run/systemd/system/`, `/etc/systemd/system/`, `/etc/systemd/user/`, `/usr/local/lib/systemd/system/`, `/lib/systemd/system/`, `/usr/lib/systemd/system/`, `/usr/lib/systemd/user/`  
+User-specific services: `~/.config/systemd/user/`, `~/.local/share/systemd/user/`
+- **Systemd Timers**  
+Each `.timer`file must have a corresponding `.service` file with the same name.
+System-wide timers: `/etc/systemd/system/`, `/usr/lib/systemd/system`,
+User-specific timers: `~/.config/systemd/`  
+- **Systemd Generator**  
+Generators are executables run by systemd at bootup or during configuration reloads.  
+System-wide generators: `/etc/systemd/system-generators/`. `/usr/local/lib/systemd/system-generators/`. `/lib/systemd/system-generators/`. `/etc/systemd/user-generators/`. `/usr/local/lib/systemd/user-generators/`. `/usr/lib/systemd/user-generators/`  
+`systemd-rc-local-generator`, `rc-local.service`: Compatibility generator and service to start `/etc/rc.local` during boot.
+4. **rc.common, rc.local**  
+The `rc.local`, `rc.common` files can start customer apps, services, scripts or commands at start-up.
+Config file `/etc/rc.*local*`
+
+Default artifact: Linux.Sys.Services
 #### User Accounts, Authentication
 1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
@@ -93,33 +125,6 @@ XDG Autostart entries can be used to execute arbitrary commands or scripts when 
 System-wide configs: `/etc/xdg/autostart/`, `/usr/share/autostart/`  
 User-specific configs: `~/.config/autostart/`, `~/.local/share/autostart/`, `~/.config/autostart-scripts/`  
 Root-specific configs: `/root/.config/autostart/`, `/root/.local/share/autostart/`, `/root/.config/autostart-scripts/`  
-#### System boot: Sytem V, Upstart, Systemd, Run Control
-Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
-1. **System V (SysV)**  
-Older init system.  
-Startup, running and shutdown scripts in `/etc/init.d/` and executed as `root` on boot.  
-Scripts are often linked to runlevel directories, determining when they are run: `/etc/rc0.d/`, `/etc/rc1.d/`,`/etc/rc2.d/`, etc.  
-2. **Upstart**  
-Older init system.
-System-wide scripts in `/etc/init/`.  
-User-session mode scripts in `~/.config/upstart/`, `~/.init/`,`/etc/xdg/upstart/`,`/usr/share/upstart/sessions/`.
-3. **Systemd**  
-System ans service manager for Linux, replacement for SysVinit. Systemd operates with `unit files`, defing how services are started, stopped or managed.  
-There are different types of `unit files`: `Service` (for managing long-running processes - typically deamons), `Timer` (similar to cron jobs).  
-- **Systemd Services**  
-System-wide services: `/run/systemd/system/`, `/etc/systemd/system/`, `/etc/systemd/user/`, `/usr/local/lib/systemd/system/`, `/lib/systemd/system/`, `/usr/lib/systemd/system/`, `/usr/lib/systemd/user/`  
-User-specific services: `~/.config/systemd/user/`, `~/.local/share/systemd/user/`
-- **Systemd Timers**  
-Each `.timer`file must have a corresponding `.service` file with the same name.
-System-wide timers: `/etc/systemd/system/`, `/usr/lib/systemd/system`,
-User-specific timers: `~/.config/systemd/`  
-- **Systemd Generator**  
-System-wide generators: `/etc/systemd/system-generators/`. `/usr/local/lib/systemd/system-generators/`. `/lib/systemd/system-generators/`. `/etc/systemd/user-generators/`. `/usr/local/lib/systemd/user-generators/`. `/usr/lib/systemd/user-generators/`  
-`systemd-rc-local-generator`, `rc-local.service`: Compatibility generator and service to start `/etc/rc.local` during boot.
-4. **rc.common, rc.local**  
-Config file `/etc/rc.local`
-
-Default artifact: Linux.Sys.Services
 #### Jobs, Crons, Timers, Automated actions  
 1. **At job** (one time jobs)  
 Config files in `/var/spool/cron/atjobs/`  
@@ -164,7 +169,12 @@ Common signals include SIGINT (interrupt, typically sent by pressing Ctrl+C), SI
 #### Rootkits, User-Space and Kernel-Space
 [Rootkits] (#rootkits) 
 "initramfs"  
+Linux tools:  
+- chkrootkit  
+- rkhunter  
+- sunlight??
 ## Privilege Escalation, overview
+## Exfiltration
 ## Useful Velociraptor Artifacts
 - Linux.Detection.Yara.Process
 - Linux.Search.FileFinder
