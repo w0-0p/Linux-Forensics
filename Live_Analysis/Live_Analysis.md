@@ -101,7 +101,7 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
 - [IDEA]: artifact to detect high entropy files (means the file is encrypted → suspicious)
 ## System Logs  
-**Syslog**
+**Syslog**  
 Check for tampered or missing logs.
 - general log files under `/var/log/*`
 - log files of interest for attackers (logins): `wtmp`, `lastlog`, `btmp`, `utmp`
@@ -109,7 +109,8 @@ Check for tampered or missing logs.
 - application specific log files under `/var/log/<application>/*`
 - security relevant events: `/var/log/audit/audit.log`
  - `#ausearch --input audit.log --format <csv/text>`: export audit.log file to another format
- - `#aureport --input audit.log --login --start YYYY-MM-DD HH:mm:ss --end YYYY-MMM-DD HH:mm:ss`: generated a report of audit.log
+ - `#aureport --input audit.log --login --start YYYY-MM-DD HH:mm:ss --end YYYY-MMM-DD HH:mm:ss`: generated a report of audit.log  
+
 **Systemd Journal**
 - `/var/log/journal/*`
 - `/run/log/jounral/*` (volatile)
