@@ -6,11 +6,36 @@
 . [Processes](#processes)
 . [Persistence, overview](#persistence-overview)
 . [Privilege Escalation, overview](#privilege-escalation-overview)
+. [Exfiltration](#exfiltration)
+. [Rootkits](#rootkits)
 . [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
 . [Useful Linux Commands](#useful-linux-commands)
 - Shells
 
 ## System Infos and Settings
+| Command | Output |
+|-------|---------|
+| **General System Information** | |
+| date | Date, time, timezone |
+| uname -a | System hostname, OS and Kernel versions |
+| uname -r | Kernel version |
+| uname -n | System hostname |
+| uname -m | Kernel architecture |
+| cat /etc/*-release | Distribution information |
+| cat /proc/stat | grep btime | System boot time |
+| **Users and Groups** | |
+| [see](#users-user-groups-and-authentication-ssh) |  |
+| **Networking** | |
+| ifconfig -a | Network interfaces |
+| netstat -nalp | Current connections, routing table, net. int. stats |
+|**Processes**| |
+| [see](#processes) | |
+| **File system** | |
+| df -a | File system information |
+| mount | File system information |
+| **Kernel** |
+| cat /proc/version | Kernel information |
+| lsmod | Lists installed kernel modules |
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
@@ -24,6 +49,7 @@
 
 **Logins**  
 Search for suspicious logins or failed attempts.  
+- `#w`: currently logged in users
 - `#last`: last successful logins
 - `#lastb`: last failed login
 - `#lastlog`: list last login for all users
@@ -60,7 +86,7 @@ Search for suspicious files, directories and creation/modification timestamps.
   - high entropy (file is encrypted)
 - hidden files or directories starting with `.`, `..`, `...`
 - `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files)
-- `#ls -lap`: lists element with a / at the end (allows to see empty spaces)
+- `#ls -alp`: lists element with a / at the end (allows to see empty spaces)
 - `#lsattr`: list attributes of a File or Dir (see if immutable flag is set)
 - `#file /path/to/file`: basic file summary
 - `#ldd /path/to/binary`: **! never run `ldd` on a suspicious binary (could execute malicious code) !** lists shared objects
@@ -74,10 +100,57 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode.
 - [IDEA]: artifact to detect high entropy files (means the file is encrypted → suspicious)
 ## System Logs  
+**Syslog**
+Check for tampered or missing logs.
+- general log files under `/var/log/*`
+- log files of interest for attackers (logins): `wtmp`, `lastlog`, `btmp`, `utmp`
+- security/authentication related events: `auth.log`
+- application specific log files under `/var/log/<application>/*`
+- security relevant events: `/var/log/audit/audit.log`
+ - `#ausearch --input audit.log --format <csv/text>`: export audit.log file to another format
+ - `#aureport --input audit.log --login --start YYYY-MM-DD HH:mm:ss --end YYYY-MMM-DD HH:mm:ss`: generated a report of audit.log
+**Systemd Journal**
+- `/var/log/journal/*`
+- `/run/log/jounral/*` (volatile)
+Anlaysis of Journal File Contents
+- `#journalctl --file <filename>`
+- `#journalctl --file system.journal -o json > sytem.journal.json`: export journal to json format (other format available)
+- `#journalctl --file system.journal _SYSTEMD_UNIT=sshd.service`: Search logs from sshd.service
+- `#journalctl --file user-1000.journal _TRANSPORT=stdout`: stdout logs of deamons and unit files
+- `#journalctl --file user-1000.journal --verify`: If journal file contains FSS information → verify integrity
+- `#journalctl --file user-1000.journal -S "YYYY-MM-DD HH:mm:ss" -U "YYYY-MM-DD HH:mm:ss"`: Search logs since (-S) until (-U)
+
 Sysmon for Linux:  
 - not maintained, not suitable for production
 - alternatives for Linux: ebpf, auditd
-## Processes
+## Processes  
+- Suspicious processes:
+  - process named to look legit
+  - open ports that seem odd
+  - outbound connections that seem odd
+  - deleted processes with open ports
+  - deleted binary
+- `#ps auxwf`: Check for process running from `/dev`, `/root`, `/temp` or high PID (process started manually after OS boot)?
+- `#pstree`: List a tree view of processes with parent-chil relations
+- `#pstree -p -s <PID>`: Process tree of a running process
+- `#top`: List processes according their ressource usage
+- `#htop`: List processes according their ressource usage
+- `netstat -nalp`: High port or raw socket open?
+- `ls -al /proc/*/fd | grep deleted`: Search for running processes spawened from a file deleted from disk (very suspicious)
+- `cat /proc/<PID>/comm`: Shows the executable's name
+- `cat /proc/<PID>/cmdline`: Shows the full command line that was used to start the process
+- `cat /proc/<PID>/environ`: Shows environment variables that were set when the process was started
+- `cat /proc/<PID>/map`: Shows the memory map
+- `cat /proc/<PID>/stack`: Shows the process stack
+- `cat /proc/<PID>/status`: Shows the process status (check if a process is masquerading as a kernel process: if process name in brackets [NAME] → Kthread must be 1 - True, kernel thread)
+- `ls -al /proc/<PID>`:
+  - `cwd -> /$DIR`: shows the process working directory
+  - `exe -> /$DIR/$FILE`: shows where the binary was stored
+- `# awk '{print $22}' /proc/<PID>/stat`: prints the process start time
+- `# stat /proc/<PID>`: General process information
+- `#lsof -i -P`: list open connections → drill down on PID (`/proc/<PID>`) → drill donw with 'strings'
+- `#strings /path/to/binary`: Outputs the strings from a binary (`listen()`, `bind()`, `accept()`, IP addresses, etc)
+- `#cat /proc/<pid>/cmdline`: Show the command-line arguments of a running process
 ## Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
@@ -175,6 +248,7 @@ Linux tools:
 - sunlight??
 ## Privilege Escalation, overview
 ## Exfiltration
+## Rootkits
 ## Useful Velociraptor Artifacts
 - Linux.Detection.Yara.Process
 - Linux.Search.FileFinder
@@ -343,7 +417,7 @@ For example:
 `no_root_squash`misconfiguration:  
 When `no_root_squash` is enabled, it bypasses root squashing, granting the root user on the client full root-level access to the locally mounted NFS shares from the remote NFS server.
 
-# (wip doc) Live Analysis
+# (wip doc) Live Analysis Process
 1. Mounting known-good binaries
 2. Using netcat
 3. Using Velociraptor
