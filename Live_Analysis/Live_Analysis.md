@@ -13,29 +13,28 @@
 - Shells
 
 ## System Infos and Settings
-| Command | Output |
-|-------|---------|
-| **General System Information** | |
-| date | Date, time, timezone |
-| uname -a | System hostname, OS and Kernel versions |
-| uname -r | Kernel version |
-| uname -n | System hostname |
-| uname -m | Kernel architecture |
-| cat /etc/*-release | Distribution information |
-| cat /proc/stat | grep btime | System boot time |
-| **Users and Groups** | |
-| [see](#users-user-groups-and-authentication-ssh) |  |
-| **Networking** | |
-| ifconfig -a | Network interfaces |
-| netstat -nalp | Current connections, routing table, net. int. stats |
-|**Processes**| |
-| [see](#processes) | |
-| **File system** | |
-| df -a | File system information |
-| mount | File system information |
-| **Kernel** |
-| cat /proc/version | Kernel information |
-| lsmod | Lists installed kernel modules |
+### Commands
+**General System Information**    
+`#date`   Date, time, timezone  
+`#uname -a`   System hostname, OS and Kernel versions  
+`#uname -r`   Kernel version  
+`#uname -n`   System hostname  
+`#uname -m`   Kernel architecture  
+`#cat /etc/*-release`   Distribution information
+`#cat /proc/stat | grep btime`    System boot time  
+**Users and Groups**  
+[see](#users-user-groups-and-authentication-ssh)  
+**Networking**  
+ifconfig -a | Network interfaces
+netstat -nalp | Current connections, routing table, net. int. stats
+**Processes**  
+[see](#processes)
+**File system**  
+df -a | File system information
+mount | File system information
+**Kernel**  
+cat /proc/version | Kernel information
+lsmod | Lists installed kernel modules
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
