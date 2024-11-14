@@ -84,7 +84,7 @@ Search for suspicious files, directories and creation/modification timestamps.
   - displayed type (name) not matching real file type
   - modified system binary
   - binary in strange location
-  - high entropy (file is encrypted)
+  - high entropy (file is encrypted) use: https://github.com/sandflysecurity/sandfly-entropyscan
 - hidden files or directories starting with `.`, `..`, `...`
 - `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files)
 - `#ls -alp`: lists element with a / at the end (allows to see empty spaces)
@@ -154,7 +154,7 @@ Sysmon for Linux:
 - `#strings /path/to/binary`: Outputs the strings from a binary (`listen()`, `bind()`, `accept()`, IP addresses, etc)
 - `#cat /proc/<pid>/cmdline`: Show the command-line arguments of a running process
 - check process name discrepancies between `/proc/<pid>/comm`, `/proc/<pid>/cmdline` additionnaly check symbolic link mismatch `#ls -l /proc/<pid>/exe`
-## Persistence, overview
+## !Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
 #### System boot: Sytem V, Upstart, Systemd, Run Control
@@ -184,9 +184,6 @@ System-wide generators: `/etc/systemd/system-generators/`. `/usr/local/lib/syste
 4. **rc.common, rc.local**  
 The `rc.local`, `rc.common` files can start customer apps, services, scripts or commands at start-up.
 Config file `/etc/rc.*local*`
-
-Default artifact: Linux.Sys.Services
-
 #### User Accounts, Authentication
 1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
@@ -217,7 +214,7 @@ These rules can be created or manipulated to gain persistence.
 UDEV rule files in:  
 `/etc/udev/rules.d/`, `/run/udev/rules.d/`, `/usr/lib/udev/rules.d/`, `/usr/local/lib/udev/rules.d/`, `/lib/udev/`
 5. Additionnal persistence mechanisms: `Anacron`, `Fcron`, `Task Spooler`, `Batch`.
-#### Shared objects/libraries
+#### !Shared objects/libraries
 1. LD_PRELOAD
 `LD_PRELOAD` is an environment variable used to specify a shared library (or multiple libraries) that should be loaded before any other shared libraries when executing a program. This allows to override functions in the standard library or other shared libraries without modifying the original binary.
 - malicious process name (`/proc/<pid>/comm` and `/proc/<pid>/cmdline`) inherits that of a legitimate executable
@@ -227,12 +224,9 @@ UDEV rule files in:
 - `#ps eaux | cat | grep LD_PRELOAD  | grep -v grep`
 - `#lsof -p <pid>`
 - `#ls /etc/ld.so.preload`
-
-#### Shell configurations
-----------------------------------------\/\/-----TO DO---\/\/----------------------------------------------------
-Default artifact: Linux.Sys.Crontab
-Or with custom artifact: Linux.Collection.Autoruns
-#### System tools and configs
+#### !Shell configurations
+----------------------------------------\/\/-----TO DO---\/\/----------------------------------------------------  
+#### !System tools and configs
 1. Shell Configuration Modification
 5. SUID (check if correct here)
 8 . Shells? (Bind shell in the background; Shell profile)
@@ -240,37 +234,36 @@ Or with custom artifact: Linux.Collection.Autoruns
 10. Hooks (Git, DPKG/RPM)
 11. Packet managers (APT/YUM/DNF)
 12. System binary wrapping for persistence ?
--------------------------------------------------------------------------------------------------------------
-#### Living of the Land Binaries
+#### !Living of the Land Binaries
 1. GTFOBins [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
 2. Modified system binaries (false)
 3. Docker container with host escape
-#### Third party tools, scripts
+#### !Third party tools, scripts
 1. [Trap](#trap)
 The trap command can catch signals and execute a specified command or set of commands when a signal is received.
 Common signals include SIGINT (interrupt, typically sent by pressing Ctrl+C), SIGTERM (termination signal), and EXIT
 (when the script exits normally or through one of the signals).
 2. Hooks [Git Backdooring]
-#### Rootkits, User-Space and Kernel-Space
-[Rootkits] (#rootkits) 
-"initramfs"  
-Linux tools:  
-- chkrootkit  
-- rkhunter  
-- sunlight??
-## Privilege Escalation, overview
-## Exfiltration
+#### !Rootkits, User-Space and Kernel-Space
+[see](#rootkits) 
+#### !Velociraptor artifacts:
+
+Default artifact: Linux.Sys.Services
+Default artifact: Linux.Sys.Crontab
+Or with custom artifact: Linux.Collection.Autoruns
+## !Privilege Escalation, overview
+## !Exfiltration
 ## Rootkits
 Rootkits can be tricky to detect as they have different mechanisms to hide on an infected system. On the other hand, it is difficult to build stable rootkits in Linux and any sudden system instabilities (crash, reboot) could indicate their presence.  
-Rootkits use following techniques to make their detection more challenging:
-- modify/hiding file content (hiding rootkit config between tags in config files or hiding a user in /etc/passwd and /etc/shadow)
-- hiding files and directores
-- hiding processes
-- hiding network traffic
-- hiding kernel modules
+Rootkits can modify or hide the following elements making their detection more challenging:
+- file content (hiding rootkit config between tags in config files or hiding a user in `/etc/passwd` and `/etc/shadow`)
+- files and directores
+- processes
+- network traffic
+- kernel modules
 They do this by targeting the following:
 - filesystem
-- process hijacking
+- hijacking process
 - shared libraries
 - system bianaries
 - hooking system calls (sytem call table)
@@ -279,16 +272,25 @@ They do this by targeting the following:
 - RAM (hiding in memory to avoid touching the disc)
 - kernel modules (LKM)
 - boot process (boot loader, kernel, initramfs)
-- BIOS / UEFI
-There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in different ways (for example, lists and count loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
-Following are some techniques and external tools that can help in their detection. If it is not possible to install these tools on the subject machine (remember to modify as little as possible on a subject machine when doing a forensic analysis), then the recommended method would be to take a memory image (LiME) and analyse it with Volatility (a separated doc for this process will follow).
-1. modifying process name
-Tools
-- bpftrace
-- Falco
-- 
+- BIOS / UEFI  
+There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in multiple different ways (for example, list, count and compare the rusults of loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
+Following are some external tools that can help in their detection. If it is not possible to install these tools on the subject machine (remember to modify as little as possible on a subject machine when doing a forensic analysis), then the recommended method would be to take a memory image (with LiME) and analyse it with Volatility (a separated doc for this process will follow).  
 
-## Useful Velociraptor Artifacts
+**Tools**  
+|Tool|Details|
+|---|---|
+| Sunlight | https://github.com/tstromberg/sunlight.git <br> set of powerfull bash scripts |
+| LinuxCatScale | https://github.com/WithSecureLabs/LinuxCatScale <br> bash script that uses live-of-the-land tools |
+| UAC | https://github.com/tclahr/uac <br> Use of native binaries and tools + **Runs everywhere with no dependencies (no installation required)** |
+| rkhunter | Rootkit, backdoor and local exploits scanner. |
+| chrootkit | Rootkit scanner. |
+| ClamAV | Antivirus scanner for Linux. |
+| bpftrace| https://github.com/bpftrace <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
+| Tracee | https://github.com/aquasecurity/tracee <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
+| Falco | https://github.com/falcosecurity/falco <br> Parses system calls against rules and alerts for violations. |
+| Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. Available rootkit artifacts:<br> Exchange.Linux.Collection.CatScale<br> Exchange.Generic.Collection.UAC |
+| Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a linux machine. Check out where its name came from. <br>  **No installation required.** |
+## !Useful Velociraptor Artifacts
 - Linux.Detection.Yara.Process
 - Linux.Search.FileFinder
 
