@@ -1,16 +1,14 @@
 # Linux Live Analysis Knowledge Base, Tips & Tricks
 1. [System Infos and Settings](#system-info-and-settings)
-. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
-. [Files, Directories and Binaries](#files-directories-and-binaries)
-. [System Logs](#system-logs)
-. [Processes](#processes)
-. [Persistence, overview](#persistence-overview)
-. [Privilege Escalation, overview](#privilege-escalation-overview)
-. [Exfiltration](#exfiltration)
-. [Rootkits](#rootkits)
-. [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
-. [Useful Linux Commands](#useful-linux-commands)
-- Shells
+2. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
+3. [Files, Directories and Binaries](#files-directories-and-binaries)
+4. [System Logs](#system-logs)
+5. [Processes](#processes)
+6. [Persistence, overview](#persistence-overview)
+7. [Privilege Escalation, overview](#privilege-escalation-overview)
+8. [Exfiltration](#exfiltration)
+9. [Rootkits](#rootkits)
+10. [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
 
 ## System Infos and Settings
 ### Commands  
@@ -37,6 +35,8 @@
 **Kernel**  
 |`#cat /proc/version` | Kernel information|
 |`#lsmod` | Lists installed kernel modules|
+**Timestamps**
+As always, never rely on the (default) timestamp from ls
 ## Users, User Groups and Authentication (SSH)
 **`/etc/passwd`**,  **`/etc/shadow`**
 - new user accounts
@@ -132,7 +132,7 @@ Sysmon for Linux:
   - outbound connections that seem odd
   - deleted processes with open ports
   - deleted binary
-- `#ps auxwf`: Check for process running from `/dev`, `/root`, `/temp` or high PID (process started manually after OS boot)?
+- `#ps auxwf`: Check for process running from `/dev`, `/root`, `/temp`, high PID (process started manually after OS boot) process masquerading as a kthread
 - `#pstree`: List a tree view of processes with parent-chil relations
 - `#pstree -p -s <PID>`: Process tree of a running process
 - `#top`: List processes according their ressource usage
@@ -153,6 +153,7 @@ Sysmon for Linux:
 - `#lsof -i -P`: list open connections → drill down on PID (`/proc/<PID>`) → drill donw with 'strings'
 - `#strings /path/to/binary`: Outputs the strings from a binary (`listen()`, `bind()`, `accept()`, IP addresses, etc)
 - `#cat /proc/<pid>/cmdline`: Show the command-line arguments of a running process
+- check process name discrepancies between `/proc/<pid>/comm`, `/proc/<pid>/cmdline` additionnaly check symbolic link mismatch `#ls -l /proc/<pid>/exe`
 ## Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
@@ -185,6 +186,7 @@ The `rc.local`, `rc.common` files can start customer apps, services, scripts or 
 Config file `/etc/rc.*local*`
 
 Default artifact: Linux.Sys.Services
+
 #### User Accounts, Authentication
 1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
@@ -215,22 +217,30 @@ These rules can be created or manipulated to gain persistence.
 UDEV rule files in:  
 `/etc/udev/rules.d/`, `/run/udev/rules.d/`, `/usr/lib/udev/rules.d/`, `/usr/local/lib/udev/rules.d/`, `/lib/udev/`
 5. Additionnal persistence mechanisms: `Anacron`, `Fcron`, `Task Spooler`, `Batch`.
+#### Shared objects/libraries
+1. LD_PRELOAD
+`LD_PRELOAD` is an environment variable used to specify a shared library (or multiple libraries) that should be loaded before any other shared libraries when executing a program. This allows to override functions in the standard library or other shared libraries without modifying the original binary.
+- malicious process name (`/proc/<pid>/comm` and `/proc/<pid>/cmdline`) inherits that of a legitimate executable
+- symbolic link `/proc/<pid>/exe` points to the legitimate binary
+- no `ptrace`systeem call for process injection
+- possible to remove `LD_PRELOAD` environment variable
+- `#ps eaux | cat | grep LD_PRELOAD  | grep -v grep`
+- `#lsof -p <pid>`
+- `#ls /etc/ld.so.preload`
 
+#### Shell configurations
+----------------------------------------\/\/-----TO DO---\/\/----------------------------------------------------
 Default artifact: Linux.Sys.Crontab
 Or with custom artifact: Linux.Collection.Autoruns
 #### System tools and configs
-1. [Shell Configuration Modification](#shell-configuration-modification)
-2. [Dynamic Linker Hijacking](#dynamic-linker) (check if correct here)
-3. [Shared object Library](#shared-object-library) (check if correct here)
-4. [Startup file](#startup-file)
-5. [SUID](#suid) (check if correct here)
-6. [System Call](#system-call)
-7. Hooks [APT Backdooring]
+1. Shell Configuration Modification
+5. SUID (check if correct here)
 8 . Shells? (Bind shell in the background; Shell profile)
 9. Capabilities?
 10. Hooks (Git, DPKG/RPM)
 11. Packet managers (APT/YUM/DNF)
 12. System binary wrapping for persistence ?
+-------------------------------------------------------------------------------------------------------------
 #### Living of the Land Binaries
 1. GTFOBins [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
 2. Modified system binaries (false)
@@ -251,6 +261,33 @@ Linux tools:
 ## Privilege Escalation, overview
 ## Exfiltration
 ## Rootkits
+Rootkits can be tricky to detect as they have different mechanisms to hide on an infected system. On the other hand, it is difficult to build stable rootkits in Linux and any sudden system instabilities (crash, reboot) could indicate their presence.  
+Rootkits use following techniques to make their detection more challenging:
+- modify/hiding file content (hiding rootkit config between tags in config files or hiding a user in /etc/passwd and /etc/shadow)
+- hiding files and directores
+- hiding processes
+- hiding network traffic
+- hiding kernel modules
+They do this by targeting the following:
+- filesystem
+- process hijacking
+- shared libraries
+- system bianaries
+- hooking system calls (sytem call table)
+- hooking functions
+- APIs
+- RAM (hiding in memory to avoid touching the disc)
+- kernel modules (LKM)
+- boot process (boot loader, kernel, initramfs)
+- BIOS / UEFI
+There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in different ways (for example, lists and count loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
+Following are some techniques and external tools that can help in their detection. If it is not possible to install these tools on the subject machine (remember to modify as little as possible on a subject machine when doing a forensic analysis), then the recommended method would be to take a memory image (LiME) and analyse it with Volatility (a separated doc for this process will follow).
+1. modifying process name
+Tools
+- bpftrace
+- Falco
+- 
+
 ## Useful Velociraptor Artifacts
 - Linux.Detection.Yara.Process
 - Linux.Search.FileFinder
@@ -261,7 +298,7 @@ To Do:
    - Exchange.Linux.Detection.IncorrectPermissions/Discrepancies
 - create artifact for Shell Configuration files
 - test ssh bruteforce and check logs
-## Useful Linux Commands
+
 
 ## ++++++++++++++++++++++++++++Clean END++++++++++++++++++++++++++++++++++++++++++++++++++
 - environment variables and can be set to execute arbitrary commands whenever an action is about to take place like git log and its

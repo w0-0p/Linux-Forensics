@@ -2,10 +2,9 @@
 The aims of this doc are:
 1. Gather known techniques for compromising Linux systems.
 2. Provide Threat-Hunting guides and procedures, when possible with Velociraptor.
-3. Improve Velociraptor's Linux detection with additionnal or improved artifacts.
 
 # Credits and Resources
-This doc is based on following sources:
+This doc is a compilation of techniques/information learned from following sources:
 1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale
 2. https://hadess.io/the-art-of-linux-persistence/
 3. https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#overview-of-blog-series
@@ -19,6 +18,7 @@ This doc is based on following sources:
 11. https://github.com/Aegrah/PANIX
 12. https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms
 13. https://github.com/elastic/detection-rules/tree/main/hunting/linux/docs
+14. https://doubleagent.net
 
 
 # Recommended Books 
