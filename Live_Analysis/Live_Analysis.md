@@ -7,7 +7,7 @@
 6. [Persistence, overview](#persistence-overview)
 7. [General Velociraptor artifacts](#general-velociraptor-artifacts)
 
-## System Infos and Settings
+## 1. System Infos and Settings
 General System Overview
 |Command|Output|
 |---|---|
@@ -44,8 +44,8 @@ General System Overview
 - `Linux.Proc.Arp`: collects ARP table via `/proc/net/arp`
 -`Linux.Sys.CPUTime`: displays information from `/proc/stat` about the time the cpu cores spent in different parts of the system
 
-## Users, User Groups and Authentication (SSH)
-**`/etc/passwd`** (Users),  **`/etc/shadow`** (hashed passwords)
+## 2. Users, User Groups and Authentication (SSH)
+User config files: **`/etc/passwd`** (Users),  **`/etc/shadow`** (hashed passwords), check for:
 - new user accounts
 - only `root` should have UID 0
 - suspicious home directories, for example hidden: `~/.hiddendir`
@@ -73,7 +73,7 @@ Check for suspicious authorized keys, unprotected private keys, suspicous SSH co
 - `/etc/ssh/ssh_config`, `/etc/ssh/ssh_config.d`, `~/.ssh/config`: ssh client config
 - if a private key is not encrypted → recommended to revoque it
 
-**Useful Velociraptor Artifacts**
+**Velociraptor Artifacts**
 - `Linux.Sys.Users`: retrieve Users
 - `Linux.Users.RootUsers`: retrieve Users in *sudo* Group
 - `Linux.Users.InteractiveUsers`: gets the interactive users
@@ -85,7 +85,7 @@ Check for suspicious authorized keys, unprotected private keys, suspicous SSH co
 - `Exchange.Linux.Detection.SSHKeyFileCmd`: parse `~/.ssh/authorizedkey` and `~/.ssh/id*.pub` looking for the command option
 - `Exchange.Linux.System.PAM`: enumerates applicable lines from the files that reside in `/etc/PAM.d/`
 
-## Files, Directories and Binaries
+## 3. Files, Directories and Binaries
 Search for suspicious files, directories and creation/modification timestamps.
 - suspicious Directories:  
   - tries to look like a system directory
@@ -108,13 +108,13 @@ Search for suspicious files, directories and creation/modification timestamps.
 - `#find /<dir> -perm 4000`: look for suspicious *setuid* files
 - `#find -nouser` `#find -nogroup`: files without assigned UID/GID (may indicate deleted user/group)
 
-**Useful Velociraptor Artifacts**
+**Velociraptor Artifacts**
 - `Linux.Detection.AnomalousFiles`: hidden, large or SUID bit set
 - `Exchange.Linux.Detection.IncorrectPermissions`: verify files/dirs and checks whether they have the expected owner, group owner and mode
 - `Linux.Search.FileFinder`: Find files on the filesystem using the name or content
 - `Exchange.Linux.Forensics.RecentlyUsed`: retrieves a list of recent files accessed by applications
 
-## System Logs  
+## 4. System Logs  
 **Syslog**  
 Check for tampered or missing logs.
 - general log files under `/var/log/*`
@@ -140,9 +140,10 @@ Anlaysis of Journal File Contents
 - not maintained, not suitable for production
 - alternatives for Linux: ebpf, auditd, and others
 
-**Useful Velociraptor Artifacts**
+**Velociraptor Artifacts**
 - `Exchange.Linux.Collection.SysLogs`: Collects system logs
-## Processes  
+
+## 5. Processes  
 Suspicious processes:
 - process named to look legit
 - open ports that seem odd
@@ -183,10 +184,14 @@ Commands:
 - `Linux.Triage.ProcessMemory`: dumps process memory
 
 
-## Persistence, overview
-![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
+## 6. Persistence, overview
+<p align="center">
+  <img src="../Images/linux-persistence-schema.png" alt="Linux persistence overview">
+  <br>
+  <em>Linux persistence overview - credits Pepe Berba</em>
+</p>
 
-### System boot: Sytem V, Upstart, Systemd, Run Control
+### 6.1 System boot: Sytem V, Upstart, Systemd, Run Control
 Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
 
 1. **System V (SysV)**  
@@ -202,7 +207,7 @@ User-session mode scripts in `~/.config/upstart/`, `~/.init/`,`/etc/xdg/upstart/
 3. **Systemd**  
 System ans service manager for Linux, replacement for SysVinit. Systemd operates with `unit files`, defing how services are started, stopped or managed.  
 There are different types of `unit files`: `Service` (for managing long-running processes - typically deamons), `Timer` (similar to cron jobs).  
-**Systemd Services**  
+- **Systemd Services**  
 System-wide services: `/run/systemd/system/`, `/etc/systemd/system/`, `/etc/systemd/user/`, `/usr/local/lib/systemd/system/`, `/lib/systemd/system/`, `/usr/lib/systemd/system/`, `/usr/lib/systemd/user/`  
 User-specific services: `~/.config/systemd/user/`, `~/.local/share/systemd/user/`
  - **Systemd Timers**  
@@ -225,7 +230,7 @@ See [virtualization](#ram-and-virtualization)
 **Velociraptor Artifacts**
 - `Linux.Sys.Services`: parses services from systemctl
 
-### User Accounts, Authentication
+### 6.2 User Accounts, Authentication
 1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
 2. **SSH Keys**  
@@ -241,7 +246,7 @@ System-wide configs: `/etc/xdg/autostart/`, `/usr/share/autostart/`
 User-specific configs: `~/.config/autostart/`, `~/.local/share/autostart/`, `~/.config/autostart-scripts/`  
 Root-specific configs: `/root/.config/autostart/`, `/root/.local/share/autostart/`, `/root/.config/autostart-scripts/`  
 
-### Jobs, Crons, Timers, Automated actions  
+### 6.3 Jobs, Crons, Timers, Automated actions  
 1. **At job** (one time jobs)  
 Config files in `/var/spool/cron/atjobs/`  
 Job detail in `/var/spool/cron/atspool/`  
@@ -262,7 +267,7 @@ UDEV rule files in:
 - `Exchange.Linux.Collection.Autoruns`: collects various autorun files
 - `Exchange.Linux.Sys.SystemdTimer`: parses content of Systemd timers
 
-### Shared objects/libraries
+### 6.4 Shared objects/libraries
 **LD_PRELOAD**  
 `LD_PRELOAD` is an environment variable used to specify a shared library (or multiple libraries) that should be loaded before any other shared libraries () when executing a program. This allows to override functions in the standard library or other shared libraries without modifying the original binary.
 - malicious process name (`/proc/<pid>/comm` and `/proc/<pid>/cmdline`) inherits that of a legitimate executable
@@ -276,7 +281,7 @@ UDEV rule files in:
 **Velociraptor Artifacts**
 - `Linux.Sys.Maps`: parses the `/proc/*/maps` to link mapped files into the process
 
-### Shell configurations, Environment Variables
+### 6.5 Shell configurations, Environment Variables
 1. **Shell scripts**  
 Different scripts are executed when a shell starts or ends.
 
@@ -300,7 +305,7 @@ There are local and system-wide environment variables.
 - `Exchange.Linux.Collection.UserConfig`: Collects user configurations
 - `Exchange.Linux.System.BashLogout`: capture Bash logout files
 
-### System Binaries
+### 6.6 System Binaries
 1. Living of the Land Binaries
 See https://gtfobins.github.io/
     - Reverse shell: https://gtfobins.github.io/#+reverse%20shell
@@ -326,7 +331,7 @@ Replace a system binary by a malicious one, executing additionnal code without b
 - `Linux.Debian.Packages`: parse dpkg status file
 - `Linux.RHEL.Packages`: parses packages installed from dnf
 
-### Loadable Kernel Modules (LKM)
+### 6.7 Loadable Kernel Modules (LKM)
 Loadable kernel modules can be dynamically loaded into the Linux Kernel at runtime to extend its functionality. There is no need to recompile the kernel or reboot the machine to apply the change. A malicious kernel module can hook kernel functions allowing to manipulate: Syscall table, Kprobes, Ftrace, VFS.
 
 **Hunting**
@@ -339,7 +344,7 @@ see https://docs.kernel.org/admin-guide/tainted-kernels.html
 
 See external [tools](#rootkits-user--and-kernel-space) and Velociraptor artifacts under the "Rootkit" part.
 
-### RAM and Virtualization
+### 6.8 RAM and Virtualization
 1. **initrd, initramfs**  
 Initramfs is a temporary file system mounted during the early boot process, before the root file system is mounted. The `/boot` directory where initramfs is stored is not monitored against integrity and makes it a perfect place to hide malicious code. 
     - Check `/proc/<pid>/ns` links
@@ -347,7 +352,7 @@ Initramfs is a temporary file system mounted during the early boot process, befo
 2. **Malicious VM or Container** (tbd)
 3. **RAM** (tbd)
 
-### Rootkits, User- and Kernel-Space
+### 6.9 Rootkits, User- and Kernel-Space
 Rootkits can be tricky to detect as they have different mechanisms to hide on an infected system. On the other hand, it is difficult to build stable kernel-rootkits in Linux and any sudden system instabilities (crash, reboot) could indicate their presence.  
 
 Rootkits can modify or hide following elements making their manual detection challenging:
@@ -385,7 +390,7 @@ Note that some of the listed tools don't required any installation on a subject 
 | Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. Available rootkit artifacts:<br> Exchange.Linux.Collection.CatScale<br> Exchange.Generic.Collection.UAC |
 | Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a Linux machine. Check out where its name came from. <br>  **No installation required.** | 
 
-## General Velociraptor Artifacts
+## 7. General Velociraptor Artifacts
 
 | Name | Details |
 |---|---|
