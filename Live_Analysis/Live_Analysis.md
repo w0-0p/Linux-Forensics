@@ -224,7 +224,7 @@ Deprecated and replaced by Systemd (compatibility through `systemd-generator`).
 The `rc.local`, `rc.common` files can start customer apps, services, scripts or commands at start-up.
 Config file `/etc/rc.*local*`
 
-5. **initrd and initramfs**
+5. **initrd and initramfs**  
 See [virtualization](#ram-and-virtualization)
 
 **Velociraptor Artifacts**
