@@ -42,7 +42,7 @@ General System Overview
 - `Linux.Network.NetstatEnriched`: reports network connections, and enrich with process information
 - `Exchange.Linux.Network.NM.Connections`: lists the NetworkManager state, configured connections and settings
 - `Linux.Proc.Arp`: collects ARP table via `/proc/net/arp`
--`Linux.Sys.CPUTime`: displays information from `/proc/stat` about the time the cpu cores spent in different parts of the system
+- `Linux.Sys.CPUTime`: displays information from `/proc/stat` about the time the cpu cores spent in different parts of the system
 
 ## 2. Users, User Groups and Authentication (SSH)
 User config files: **`/etc/passwd`** (Users),  **`/etc/shadow`** (hashed passwords), check for:
@@ -157,22 +157,21 @@ Commands:
 - `#pstree -p -s <PID>`: Process tree of a running process
 - `#top`: List processes according their ressource usage
 - `#htop`: List processes according their ressource usage
-- `netstat -nalp`: High port or raw socket open?
-- `ls -al /proc/*/fd | grep deleted`: Search for running processes spawened from a file deleted from disk (very suspicious)
-- `cat /proc/<PID>/comm`: Shows the executable's name
-- `cat /proc/<PID>/cmdline`: Shows the full command line that was used to start the process
-- `cat /proc/<PID>/environ`: Shows environment variables that were set when the process was started
-- `cat /proc/<PID>/map`: Shows the memory map
-- `cat /proc/<PID>/stack`: Shows the process stack
-- `cat /proc/<PID>/status`: Shows the process status (check if a process is masquerading as a kernel process: if process name in brackets [NAME] → Kthread must be 1 - True, kernel thread)
-- `ls -al /proc/<PID>`:
+- `#netstat -nalp`: High port or raw socket open?
+- `#ls -al /proc/*/fd | grep deleted`: Search for running processes spawened from a file deleted from disk (very suspicious)
+- `#cat /proc/<PID>/comm`: Shows the executable's name
+- `#cat /proc/<PID>/cmdline`: Shows the full command line that was used to start the process
+- `#cat /proc/<PID>/environ`: Shows environment variables that were set when the process was started
+- `#cat /proc/<PID>/map`: Shows the memory map
+- `#cat /proc/<PID>/stack`: Shows the process stack
+- `#cat /proc/<PID>/status`: Shows the process status (check if a process is masquerading as a kernel process: if process name in brackets [NAME] → Kthread must be 1 - True, kernel thread)
+- `#ls -al /proc/<PID>`:
   - `cwd -> /$DIR`: Shows the process working directory
   - `exe -> /$DIR/$FILE`: Shows where the binary was stored
-- `# awk '{print $22}' /proc/<PID>/stat`: Prints the process start time
-- `# stat /proc/<PID>`: General process information
+- `#awk '{print $22}' /proc/<PID>/stat`: Prints the process start time
+- `#stat /proc/<PID>`: General process information
 - `#lsof -i -P`: Lists open connections → drill down on PID (`/proc/<PID>`) → drill donw with 'strings'
 - `#strings /path/to/binary`: Outputs the strings from a binary (`listen()`, `bind()`, `accept()`, IP addresses, etc)
-- `#cat /proc/<pid>/cmdline`: Show the command-line arguments of a running process
 - Check process name discrepancies between `/proc/<pid>/comm`, `/proc/<pid>/cmdline` additionnaly check symbolic link mismatch `#ls -l /proc/<pid>/exe`
 
 **Velociraptor Artifacts**
@@ -379,7 +378,7 @@ Note that some of the listed tools don't required any installation on a subject 
 |---|---|
 | Sunlight | https://github.com/tstromberg/sunlight.git <br> set of powerfull bash scripts |
 | LinuxCatScale | https://github.com/WithSecureLabs/LinuxCatScale <br> bash script that uses live-of-the-land tools |
-| UAC | https://github.com/tclahr/uac <br> Use of native binaries and tools + **Runs everywhere with no dependencies (no installation required)** |
+| UAC | https://github.com/tclahr/uac <br> Use of native binaries and tools <br> **Runs everywhere with no dependencies (no installation required)** |
 | rkhunter | Rootkit, backdoor and local exploits scanner. |
 | chrootkit | Rootkit scanner. |
 | unhide | https://salsa.debian.org/pkg-security-team/unhide <br> (part of Kali) find processes and TCP/UDP ports hidden by rootkits |
@@ -387,8 +386,8 @@ Note that some of the listed tools don't required any installation on a subject 
 | bpftrace| https://github.com/bpftrace <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
 | Tracee | https://github.com/aquasecurity/tracee <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
 | Falco | https://github.com/falcosecurity/falco <br> Parses system calls against rules and alerts for violations. |
-| Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. Available rootkit artifacts:<br> Exchange.Linux.Collection.CatScale<br> Exchange.Generic.Collection.UAC |
-| Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a Linux machine. Check out where its name came from. <br>  **No installation required.** | 
+| Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. |
+| Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a Linux machine. Check out where its name came from. <br>  **Runs everywhere with no dependencies (no installation required)** | 
 
 ## 7. General Velociraptor Artifacts
 
