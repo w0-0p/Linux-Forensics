@@ -34,7 +34,7 @@ General System Overview
 |`#cat /proc/version` | Kernel information|
 |`#lsmod` | Lists installed kernel modules|
 
-**Useful Velociraptor Artifacts**
+**Velociraptor Artifacts**
 - `Exchange.Linux.Collection.SysConfig`: collects system configurations
 - `Linux.Mounts`: lists mounted filesystems by reading `/proc/mount`
 - `Exchange.Linux.Collection.NetworkConfig`: collects network config files
