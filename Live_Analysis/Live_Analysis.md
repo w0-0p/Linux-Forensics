@@ -7,8 +7,7 @@
 6. [Persistence, overview](#persistence-overview)
 7. [Privilege Escalation, overview](#privilege-escalation-overview)
 8. [Exfiltration](#exfiltration)
-9. [Rootkits](#rootkits)
-10. [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
+9. [Usefull Velociraptor artifacts](#useful-velociraptor-artifacts)
 
 ## System Infos and Settings
 ### Commands  
@@ -35,15 +34,16 @@
 **Kernel**  
 |`#cat /proc/version` | Kernel information|
 |`#lsmod` | Lists installed kernel modules|
-**Timestamps**
-As always, never rely on the (default) timestamp from ls
+
+-------**Timestamps**
+As always, never rely on the (default) timestamp from ls-------
 ## Users, User Groups and Authentication (SSH)
-**`/etc/passwd`**,  **`/etc/shadow`**
+**`/etc/passwd`** (Users),  **`/etc/shadow`** (hashed passwords)
 - new user accounts
 - only `root` should have UID 0
 - suspicious home directories, for example hidden: `~/.hiddendir`
 - login shell (service users must have `nologin` or `false`)  
-- check for password hashes inside `/etc/shadow` for users without a shell
+- in `/etc/shadow` check for password hashes for users without a shell
 
 **`/etc/group`**  
 - lists groups and members
@@ -109,7 +109,7 @@ Check for tampered or missing logs.
 - application specific log files under `/var/log/<application>/*`
 - security relevant events: `/var/log/audit/audit.log`
  - `#ausearch --input audit.log --format <csv/text>`: export audit.log file to another format
- - `#aureport --input audit.log --login --start YYYY-MM-DD HH:mm:ss --end YYYY-MMM-DD HH:mm:ss`: generated a report of audit.log  
+ - `#aureport --input audit.log --login --start YYYY-MM-DD HH:mm:ss --end YYYY-MMM-DD HH:mm:ss`: generate a report of audit.log  
 
 **Systemd Journal**
 - `/var/log/journal/*`
@@ -122,7 +122,7 @@ Anlaysis of Journal File Contents
 - `#journalctl --file user-1000.journal --verify`: If journal file contains FSS information → verify integrity
 - `#journalctl --file user-1000.journal -S "YYYY-MM-DD HH:mm:ss" -U "YYYY-MM-DD HH:mm:ss"`: Search logs since (-S) until (-U)
 
-Sysmon for Linux:  
+**Sysmon for Linux**  
 - not maintained, not suitable for production
 - alternatives for Linux: ebpf, auditd
 ## Processes  
@@ -133,7 +133,7 @@ Sysmon for Linux:
   - deleted processes with open ports
   - deleted binary
 - `#ps auxwf`: Check for process running from `/dev`, `/root`, `/temp`, high PID (process started manually after OS boot) process masquerading as a kthread
-- `#pstree`: List a tree view of processes with parent-chil relations
+- `#pstree`: List a tree view of processes with parent-child relations
 - `#pstree -p -s <PID>`: Process tree of a running process
 - `#top`: List processes according their ressource usage
 - `#htop`: List processes according their ressource usage
@@ -154,14 +154,14 @@ Sysmon for Linux:
 - `#strings /path/to/binary`: Outputs the strings from a binary (`listen()`, `bind()`, `accept()`, IP addresses, etc)
 - `#cat /proc/<pid>/cmdline`: Show the command-line arguments of a running process
 - check process name discrepancies between `/proc/<pid>/comm`, `/proc/<pid>/cmdline` additionnaly check symbolic link mismatch `#ls -l /proc/<pid>/exe`
-## !Persistence, overview
+## Persistence, overview
 ![Linux persistence overview - credits to Pepe Berba](../Images/linux-persistence-schema.png)
 ### Persistence techniques (non exhaustive list)
-#### System boot: Sytem V, Upstart, Systemd, Run Control
+#### [System boot: Sytem V, Upstart, Systemd, Run Control](#system-boot-sytem-v-upstart-systemd-run-control)
 Different scripts are run during system boot. These scripts can be created or modified to gain persistence.  
 1. **System V (SysV)**  
 Older init system.  
-Startup, running and shutdown scripts in `/etc/init.d/` and executed as `root` on boot.  
+Startup, running and shutdown scripts in `/etc/init.d/` and executed as `root` on boot (compatibility through `systemd-generator`).  
 Scripts are often linked to runlevel directories, determining when they are run: `/etc/rc0.d/`, `/etc/rc1.d/`,`/etc/rc2.d/`, etc.  
 2. **Upstart**  
 Older init system.  
@@ -182,8 +182,11 @@ Generators are executables run by systemd at bootup or during configuration relo
 System-wide generators: `/etc/systemd/system-generators/`. `/usr/local/lib/systemd/system-generators/`. `/lib/systemd/system-generators/`. `/etc/systemd/user-generators/`. `/usr/local/lib/systemd/user-generators/`. `/usr/lib/systemd/user-generators/`  
 `systemd-rc-local-generator`, `rc-local.service`: Compatibility generator and service to start `/etc/rc.local` during boot.
 4. **rc.common, rc.local**  
+Deprecated and replaced by Systemd (compatibility through `systemd-generator`).  
 The `rc.local`, `rc.common` files can start customer apps, services, scripts or commands at start-up.
 Config file `/etc/rc.*local*`
+5. **initrd and initramfs**
+See [virtualization](#ram-and-virtualization)
 #### User Accounts, Authentication
 1. **User Accounts and Groups**  
 [See](#users-user-groups-and-authentication-ssh)
@@ -214,69 +217,80 @@ These rules can be created or manipulated to gain persistence.
 UDEV rule files in:  
 `/etc/udev/rules.d/`, `/run/udev/rules.d/`, `/usr/lib/udev/rules.d/`, `/usr/local/lib/udev/rules.d/`, `/lib/udev/`
 5. Additionnal persistence mechanisms: `Anacron`, `Fcron`, `Task Spooler`, `Batch`.
-#### !Shared objects/libraries
+#### [Shared objects/libraries](#shared-object-library)
 1. LD_PRELOAD
-`LD_PRELOAD` is an environment variable used to specify a shared library (or multiple libraries) that should be loaded before any other shared libraries when executing a program. This allows to override functions in the standard library or other shared libraries without modifying the original binary.
+`LD_PRELOAD` is an environment variable used to specify a shared library (or multiple libraries) that should be loaded before any other shared libraries () when executing a program. This allows to override functions in the standard library or other shared libraries without modifying the original binary.
 - malicious process name (`/proc/<pid>/comm` and `/proc/<pid>/cmdline`) inherits that of a legitimate executable
 - symbolic link `/proc/<pid>/exe` points to the legitimate binary
 - no `ptrace`systeem call for process injection
 - possible to remove `LD_PRELOAD` environment variable
 - `#ps eaux | cat | grep LD_PRELOAD  | grep -v grep`
 - `#lsof -p <pid>`
-- `#ls /etc/ld.so.preload`
-#### !Shell configurations
-----------------------------------------\/\/-----TO DO---\/\/----------------------------------------------------  
-#### !System tools and configs
-1. Shell Configuration Modification
-5. SUID (check if correct here)
-8 . Shells? (Bind shell in the background; Shell profile)
-9. Capabilities?
-10. Hooks (Git, DPKG/RPM)
-11. Packet managers (APT/YUM/DNF)
-12. System binary wrapping for persistence ?
-#### !Living of the Land Binaries
-1. GTFOBins [GTFOBins Reverse Shell](#gtfobins-reverse-shell)
-2. Modified system binaries (false)
-3. Docker container with host escape
-#### !Third party tools, scripts
-1. [Trap](#trap)
-The trap command can catch signals and execute a specified command or set of commands when a signal is received.
-Common signals include SIGINT (interrupt, typically sent by pressing Ctrl+C), SIGTERM (termination signal), and EXIT
-(when the script exits normally or through one of the signals).
-2. Hooks [Git Backdooring]
-#### !Rootkits, User-Space and Kernel-Space
-[see](#rootkits) 
-#### !Velociraptor artifacts:
-
-Default artifact: Linux.Sys.Services
-Default artifact: Linux.Sys.Crontab
-Or with custom artifact: Linux.Collection.Autoruns
-## !Privilege Escalation, overview
-## !Exfiltration
-## Rootkits
-Rootkits can be tricky to detect as they have different mechanisms to hide on an infected system. On the other hand, it is difficult to build stable rootkits in Linux and any sudden system instabilities (crash, reboot) could indicate their presence.  
-Rootkits can modify or hide the following elements making their detection more challenging:
-- file content (hiding rootkit config between tags in config files or hiding a user in `/etc/passwd` and `/etc/shadow`)
+- `#ls /etc/ld.so.preload` (system-wide config)
+#### Shell configurations
+Different scripts are executed when a shell starts or ends.
+| Files | Working |
+|-------|---------|
+| /etc/bash.bashrc | systemwide files executed at the start of interactive shell |
+| /etc/bash_logout | Systemwide files executed when we terminate the shell |
+| ~/.bashrc	| Widly exploited user specific startup script executed at the start of shell |
+| ~/.bash_profile, ~/.bash_login, ~/.profile | User specific files , but which found first are executed first |
+| ~.bash_logout | User specific files, executed when shell session closes |
+| ~/.bash_logout | User-specific clean up script at the end of the session |
+| /etc/profile | Systemwide files executed at the start of login shells |
+| /etc/profile.d | all the .sh files are executed at the start of login shells |
+Inspect Bash logout files: Linux.System.BashLogout
+#### System Binaries
+1. Living of the Land Binaries
+See https://gtfobins.github.io/
+ - Reverse shell: https://gtfobins.github.io/#+reverse%20shell
+ - Non-interactive reverse shell: https://gtfobins.github.io/#+non-interactive%20reverse%20shell
+ - Bind shell: https://gtfobins.github.io/#+bind%20shell
+ - Non-interactive bind shell: https://gtfobins.github.io/#+non-interactive%20bind%20shell
+2. Modified or substituted system binaries
+ - for example, replace `/bin/false` with `/bin/bash` (usefull to hide a shell-login in `/etc/passwd`)
+3. System Binary Wrapping
+Replace a system binary by a malicious one, executing additionnal code without breaking the functionnality of the original system binary.
+ - compare binary hashes to known-good ones (`#sha256sum <file>`)
+ - monitor file integrity with AIDE, `#rpm -Va` (Red Hat)
+4. Packet Manager 
+ Modified packet manager configurations
+  - `/etc/apt/apt.conf.d/*`
+  - `/usr/lib/python*/site-packages/dnf-plugins/*`
+  - `/etc/dnf/plugins/*`
+  - `/usr/lib/yum-plugins/*`
+  - `/etc/yum/pluginconf.d/*`
+#### [Loadable Kernel Modules (LKM)](#loadable-kernel-modules-lkm)
+ Loadable kernel modules can be dynamically loaded into the Linux Kernel at runtime to extend its functionality. There is no need to recompile the kernel or reboot the machine to apply the change. A malicious kernel module can hook kernel functions allowing to manipulate: Syscall table, Kprobes, Ftrace, VFS.
+ **Hunting**
+ - look for commands containing `#insmod`, `#rmmod`, `#modprobe`, `#lsmod`
+ - `#cat /proc/modules`: Currently loaded kernel modules.
+ - `# cat /proc/modules | grep OE`: Find unsigned or out-of-tree loaded modules.
+ - `/sys/module/`: inforamtion about currently loaded kernel modules.
+ - check kernel taint: `#cat /proc/sys/kernel/tainted`, `#dmesg | grep taint`
+ see https://docs.kernel.org/admin-guide/tainted-kernels.html
+ See external [tools](#rootkits-user-space-and-kernel-space) under the "Rootkit" part.
+#### [RAM and Virtualization](#ram-and-virtualization)
+1. initrd, initramfs
+Initramfs is a temporary file system mounted during the early boot process, before the root file system is mounted. The `/boot` directory where initramfs is stored is not monitored against integrity and makes it a perfect place to hide malicious code. 
+ - Check `/proc/<pid>/ns` links
+ - Check Kernel threads proc entries (ppid != 0)
+2. Malicious VM or Container (tbd)
+3. RAM (tbd)
+#### Rootkits, User- and Kernel-Space
+Rootkits can be tricky to detect as they have different mechanisms to hide on an infected system. On the other hand, it is difficult to build stable kernel-rootkits in Linux and any sudden system instabilities (crash, reboot) could indicate their presence.  
+Rootkits can modify or hide following elements making their manual detection challenging:
+- file content (hiding rootkit config between tags in config files or hiding a user in `/etc/passwd` and `/etc/shadow`)  
+Note: to uncloak a hidden file content → `#grep . <file>` (will stream the file content)
 - files and directores
 - processes
 - network traffic
 - kernel modules
-They do this by targeting the following:
-- filesystem
-- hijacking process
-- shared libraries
-- system bianaries
-- hooking system calls (sytem call table)
-- hooking functions
-- APIs
-- RAM (hiding in memory to avoid touching the disc)
-- kernel modules (LKM)
-- boot process (boot loader, kernel, initramfs)
-- BIOS / UEFI  
-There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in multiple different ways (for example, list, count and compare the rusults of loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
+Rootkits persistence mechanisms, see [system boot](#system-boot-sytem-v-upstart-systemd-run-control), [Shared objects/libraries](#shared-object-library), [Loadable Kernel Modules (LKM)](#loadable-kernel-modules-lkm), [Virtualization](#virtualization).  
+There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in multiple different ways (for example compare the loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
 Following are some external tools that can help in their detection. If it is not possible to install these tools on the subject machine (remember to modify as little as possible on a subject machine when doing a forensic analysis), then the recommended method would be to take a memory image (with LiME) and analyse it with Volatility (a separated doc for this process will follow).  
-
-**Tools**  
+Note that some of the listed tools don't required any installation on a subject machine and are therfore very usefull for a live analysis.  
+**Rootkit Detection Tools**  
 |Tool|Details|
 |---|---|
 | Sunlight | https://github.com/tstromberg/sunlight.git <br> set of powerfull bash scripts |
@@ -284,12 +298,20 @@ Following are some external tools that can help in their detection. If it is not
 | UAC | https://github.com/tclahr/uac <br> Use of native binaries and tools + **Runs everywhere with no dependencies (no installation required)** |
 | rkhunter | Rootkit, backdoor and local exploits scanner. |
 | chrootkit | Rootkit scanner. |
+| unhide | https://salsa.debian.org/pkg-security-team/unhide <br> (part of Kali) find processes and TCP/UDP ports hidden by rootkits |
 | ClamAV | Antivirus scanner for Linux. |
 | bpftrace| https://github.com/bpftrace <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
 | Tracee | https://github.com/aquasecurity/tracee <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
 | Falco | https://github.com/falcosecurity/falco <br> Parses system calls against rules and alerts for violations. |
 | Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. Available rootkit artifacts:<br> Exchange.Linux.Collection.CatScale<br> Exchange.Generic.Collection.UAC |
-| Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a linux machine. Check out where its name came from. <br>  **No installation required.** |
+| Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a Linux machine. Check out where its name came from. <br>  **No installation required.** | 
+#### !Velociraptor artifacts:
+
+Default artifact: Linux.Sys.Services
+Default artifact: Linux.Sys.Crontab
+Or with custom artifact: Linux.Collection.Autoruns
+## !Privilege Escalation, overview
+## !Exfiltration
 ## !Useful Velociraptor Artifacts
 - Linux.Detection.Yara.Process
 - Linux.Search.FileFinder
@@ -355,27 +377,6 @@ Artifact: Exchange.Linux.Detection.CVE20214034
 
 ## Shell
 keygen command (lateral movement)
-
-
-************************************************************
-## Shell Configuration Modification
-
-| Files | Working |
-|-------|---------|
-| /etc/bash.bashrc | systemwide files executed at the start of interactive shell |
-| /etc/bash_logout | Systemwide files executed when we terminate the shell |
-| ~/.bashrc	| Widly exploited user specific startup script executed at the start of shell |
-| ~/.bash_profile, ~/.bash_login, ~/.profile | User specific files , but which found first are executed first |
-| ~.bash_logout | User specific files, executed when shell session closes |
-| ~/.bash_logout | User-specific clean up script at the end of the session |
-| /etc/profile | Systemwide files executed at the start of login shells |
-| /etc/profile.d | all the .sh files are executed at the start of login shells |
-
-#### Check it with Velociraptor:
-
-Inspect Bash logout files: Linux.System.BashLogout
-Search for files: Linux.Search.FileFinder
-
 
 # 04 Privilege Escalation
 

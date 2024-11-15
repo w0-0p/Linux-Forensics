@@ -1,11 +1,9 @@
 # Aims
-The aims of this doc are:
-1. Gather known techniques for compromising Linux systems.
-2. Provide Threat-Hunting guides and procedures, when possible with Velociraptor.
+This doc gives a quick and condensed introduction of techniques used to compromise Linux systems and how to hunt for them. - I use it personnaly to improve and keep my Linux defense knowledge up-to-date.
 
 # Credits and Resources
-This doc is a compilation of techniques/information learned from following sources:
-1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale
+This doc is a compilation of techniques/information learned from following sources (thank you for sharing this great content):
+1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale (**I highly recommend this training to anyone interested in Linux attack/defense**)
 2. https://hadess.io/the-art-of-linux-persistence/
 3. https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#overview-of-blog-series
 4. https://gtfobins.github.io
@@ -19,9 +17,12 @@ This doc is a compilation of techniques/information learned from following sourc
 12. https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms
 13. https://github.com/elastic/detection-rules/tree/main/hunting/linux/docs
 14. https://doubleagent.net
+15. https://www.wiz.io/blog
+16. https://breachlabs.io/initramfs-persistence-technique
+17. https://www.blackhat.com/docs/us-16/materials/us-16-Leibowitz-Horse-Pill-A-New-Type-Of-Linux-Rootkit.pdf
 
-
-# Recommended Books 
+# Books 
 - Practical Linux Forensics, Bruce Nikkel  
 - Linux Forensics, Philip Polstra  
 - The Linux Programming Interface, Michael Kerrisk
+- Black Hat Bash, Nick Aleks, Dolev Farhi
