@@ -1,5 +1,5 @@
 # Aims
-This doc gives a quick and condensed introduction of techniques used to compromise Linux systems and how to hunt for them. - I use it personnaly to improve and keep my Linux defense knowledge up-to-date.
+This doc gives a condensed overview of methods for assessing if a Linux system is compromised and how to analyse it. - I use it personnaly to improve and keep my Linux defense knowledge up-to-date.
 
 # Credits and Resources
 This doc is a compilation of techniques/information learned from following sources (thank you for sharing this great content):
