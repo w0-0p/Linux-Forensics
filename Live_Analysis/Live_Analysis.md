@@ -8,6 +8,7 @@
 7. [General Velociraptor artifacts](#general-velociraptor-artifacts)
 
 ## 1. System Infos and Settings
+
 General System Overview
 |Command|Output|
 |---|---|
@@ -374,6 +375,7 @@ Note that some of the listed tools don't required any installation on a subject 
 - `Exchange.Linux.Detection.BPFmaps`: parses `/proc/fd/` files and looks for processes that have been created by bpf-maps
 
 **Rootkit Detection Tools**  
+
 |Tool|Details|
 |---|---|
 | Sunlight | https://github.com/tstromberg/sunlight.git <br> set of powerfull bash scripts |
