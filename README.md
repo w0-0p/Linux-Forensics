@@ -11,7 +11,7 @@ This doc is a compilation of techniques/information learned from following sourc
 3. <https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#overview-of-blog-series>
 4. <https://gtfobins.github.io>
 5. <https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/linux-forensics>
-6. <h>ttps://www.youtube.com/@SandflySecurity>
+6. <https://www.youtube.com/@SandflySecurity>
 7. <https://www.youtube.com/playlist?list=PLC3HQmfNLLKSzgW4z-QsIFz0j2BVMQbm_>
 8. <https://righteousit.com>
 9. <https://attack.mitre.org/matrices/enterprise/linux/>
