@@ -13,7 +13,7 @@ General System Overview
 
 |Command|Output|
 |---|---|
-**System Information** 
+|**System Information**||
 | `ls` | Note: timestamps can easily be manipulated. Don't trust 'ls' timestamps. |
 |`#date`|Date, time, timezone|
 |`#uname -a` | System hostname, OS and Kernel versions|
@@ -22,17 +22,17 @@ General System Overview
 |`#uname -m` | Kernel architecture| 
 |`#cat /etc/*-release` | Distribution information
 |`#cat /proc/stat \| grep btime` | System boot time  
-**Users and Groups**  
+|**Users and Groups**||
 |[see](#users-user-groups-and-authentication-ssh)||  
-**Networking**  
+|**Networking**||
 |`#ifconfig -a` | Network interfaces|
 |`#netstat -nalp` | Current connections, routing table, net. int. stats|
-**Processes**  
+|**Processes**||
 |[see](#processes)||
-**File system**  
+|**File system**||
 |`#df -a` | File system information|
 |`#mount` | File system information|
-**Kernel**  
+|**Kernel**||
 |`#cat /proc/version` | Kernel information|
 |`#lsmod` | Lists installed kernel modules|
 
