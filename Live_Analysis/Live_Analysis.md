@@ -1,11 +1,11 @@
 # Linux Live Analysis Knowledge Base, Tips & Tricks
-1. [System Infos and Settings](#system-infos-and-settings)
-2. [Users, User Groups and Authentication (SSH)](#users-user-groups-and-authentication-ssh)
-3. [Files, Directories and Binaries](#files-directories-and-binaries)
-4. [System Logs](#system-logs)
-5. [Processes](#processes)
-6. [Persistence, overview](#persistence-overview)
-7. [General Velociraptor artifacts](#general-velociraptor-artifacts)
+1. [System Infos and Settings](#1-system-infos-and-settings)
+2. [Users, User Groups and Authentication (SSH)](#2-users-user-groups-and-authentication-ssh)
+3. [Files, Directories and Binaries](#3-files-directories-and-binaries)
+4. [System Logs](#4-system-logs)
+5. [Processes](#5-processes)
+6. [Persistence, overview](#6-persistence-overview)
+7. [General Velociraptor artifacts](#6-persistence-overview)
 
 ## 1. System Infos and Settings
 
@@ -23,12 +23,12 @@ General System Overview
 |`#cat /etc/*-release` | Distribution information
 |`#cat /proc/stat \| grep btime` | System boot time  
 |**Users and Groups**||
-|[see](#users-user-groups-and-authentication-ssh)||  
+|[see](#2-users-user-groups-and-authentication-ssh)||  
 |**Networking**||
 |`#ifconfig -a` | Network interfaces|
 |`#netstat -nalp` | Current connections, routing table, net. int. stats|
 |**Processes**||
-|[see](#processes)||
+|[see](#5-processes)||
 |**File system**||
 |`#df -a` | File system information|
 |`#mount` | File system information|
@@ -98,7 +98,7 @@ Search for suspicious files, directories and creation/modification timestamps.
   - displayed type (name) not matching real file type
   - modified system binary
   - binary in strange location
-  - high entropy (file is encrypted) use: https://github.com/sandflysecurity/sandfly-entropyscan
+  - high entropy (file is encrypted) use: <https://github.com/sandflysecurity/sandfly-entropyscan>
 - hidden files or directories starting with `.`, `..`, `...`
 - `/tmp`, `/var/tmp`, `/dev/shm`: world-writable directories (often used to drop malicious files)
 - `#ls -alp`: lists element with a / at the end (allows to see empty spaces)
@@ -226,16 +226,16 @@ The `rc.local`, `rc.common` files can start customer apps, services, scripts or 
 Config file `/etc/rc.*local*`
 
 5. **initrd and initramfs**  
-See [virtualization](#ram-and-virtualization)
+See [virtualization](#68-ram-and-virtualization)
 
 **Velociraptor Artifacts**
 - `Linux.Sys.Services`: parses services from systemctl
 
 ### 6.2 User Accounts, Authentication
 1. **User Accounts and Groups**  
-[See](#users-user-groups-and-authentication-ssh)
+[See](#2-users-user-groups-and-authentication-ssh)
 2. **SSH Keys**  
-[See](#users-user-groups-and-authentication-ssh)
+[See](#2-users-user-groups-and-authentication-ssh)
 3. **MOTD**  
 Message of the day (MOTD) is a message presented to a user when he/she connects via SSH or a serial connection.
 If activated, MOTD scripts are executed as `root` every time a user connects to a Linux system.
@@ -301,7 +301,7 @@ Different scripts are executed when a shell starts or ends.
 Each process has en environment list, wich is a set of environment variables. When a new process is created via *fork()*, it inherits a copy of its parent's environment. There are multiple use cases for environment variables. For example the env. variable `SHELL` defines the path to the shell that programms will use when they need a shell, or `HOME` that defines the home directory of a user.
 There are local and system-wide environment variables.  
 
-~~~~TO DO~~~~~
+TO DO
 
 **Velociraptor Artifacts**
 - `Exchange.Linux.Collection.History`: Collects history files
@@ -345,9 +345,10 @@ Loadable kernel modules can be dynamically loaded into the Linux Kernel at runti
 - check kernel taint: `#cat /proc/sys/kernel/tainted`, `#dmesg | grep taint`  
 see <https://docs.kernel.org/admin-guide/tainted-kernels.html>  
 
-See external [tools](#rootkits-user--and-kernel-space) and Velociraptor artifacts under the "Rootkit" part.
+See external [tools](#69-rootkits-user--and-kernel-space) and Velociraptor artifacts under the "Rootkit" part.
 
 ### 6.8 RAM and Virtualization
+
 1. **initrd, initramfs**  
 Initramfs is a temporary file system mounted during the early boot process, before the root file system is mounted. The `/boot` directory where initramfs is stored is not monitored against integrity and makes it a perfect place to hide malicious code. 
     - Check `/proc/<pid>/ns` links
@@ -366,7 +367,7 @@ Note: to uncloak a hidden file content → `#grep . <file>` (will stream the fil
 - network traffic
 - kernel modules
 
-For rootkits persistence mechanisms, see [system boot](#system-boot-sytem-v-upstart-systemd-run-control), [Shared objects/libraries](#shared-objectslibraries), [Loadable Kernel Modules (LKM)](#loadable-kernel-modules-lkm), [Virtualization](#ram-and-virtualization).  
+For rootkits persistence mechanisms, see [system boot](#61-system-boot-sytem-v-upstart-systemd-run-control), [Shared objects/libraries](#64-shared-objectslibraries), [Loadable Kernel Modules (LKM)](#67-loadable-kernel-modules-lkm), [Virtualization](#68-ram-and-virtualization).  
 
 There is no silver bullet to detect rootkits using common Linux system utilities. It is recommended to compare the subject machine to a known-good VM or to retrieve the same information in multiple different ways (for example compare the loaded kernel modules with `lsmod`, `cat /proc/modules`, `kmod list`).  
 Following are some external tools that can help in their detection. If it is not possible to install these tools on the subject machine (remember to modify as little as possible on a subject machine when doing a forensic analysis), then the recommended method would be to take a memory image (with LiME) and analyse it with Volatility (a separated doc for this process will follow).  
