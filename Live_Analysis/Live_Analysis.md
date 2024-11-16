@@ -5,7 +5,7 @@
 4. [System Logs](#4-system-logs)
 5. [Processes](#5-processes)
 6. [Persistence, overview](#6-persistence-overview)
-7. [General Velociraptor artifacts](#6-persistence-overview)
+7. [General Velociraptor artifacts](#7-general-velociraptor-artifacts)
 
 ## 1. System Infos and Settings
 
