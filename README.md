@@ -1,6 +1,9 @@
 # Aims
 This doc gives a condensed overview of methods for assessing if a Linux system is compromised and how to analyse it. - I use it personnaly to improve and keep my Linux defense knowledge up-to-date.
 
+# Linux Forensics
+1. [Live Analysis](Live_Analysis/Live_Analysis.md)
+
 # Credits and Resources
 This doc is a compilation of techniques/information learned from following sources (thank you for sharing this great content):
 1. https://edu.defensive-security.com/linux-attack-live-forensics-at-scale (**I highly recommend this training to anyone interested in Linux attack/defense**)
