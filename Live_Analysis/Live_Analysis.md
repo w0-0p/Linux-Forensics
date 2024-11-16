@@ -283,6 +283,7 @@ UDEV rule files in:
 - `Linux.Sys.Maps`: parses the `/proc/*/maps` to link mapped files into the process
 
 ### 6.5 Shell configurations, Environment Variables
+
 1. **Shell scripts**  
 Different scripts are executed when a shell starts or ends.
 
@@ -296,10 +297,11 @@ Different scripts are executed when a shell starts or ends.
 | `~/.bash_logout` | User-specific clean up script at the end of the session |
 | `/etc/profile` | Systemwide files executed at the start of login shells |
 | `/etc/profile.d` | all the .sh files are executed at the start of login shells |
-
 2. **Environment Variables**  
 Each process has en environment list, wich is a set of environment variables. When a new process is created via *fork()*, it inherits a copy of its parent's environment. There are multiple use cases for environment variables. For example the env. variable `SHELL` defines the path to the shell that programms will use when they need a shell, or `HOME` that defines the home directory of a user.
-There are local and system-wide environment variables.
+There are local and system-wide environment variables.  
+
+~~~~TO DO~~~~~
 
 **Velociraptor Artifacts**
 - `Exchange.Linux.Collection.History`: Collects history files
@@ -309,10 +311,10 @@ There are local and system-wide environment variables.
 ### 6.6 System Binaries
 1. Living of the Land Binaries
 See https://gtfobins.github.io/
-    - Reverse shell: https://gtfobins.github.io/#+reverse%20shell
-    - Non-interactive reverse shell: https://gtfobins.github.io/#+non-interactive%20reverse%20shell
-    - Bind shell: https://gtfobins.github.io/#+bind%20shell
-    - Non-interactive bind shell: https://gtfobins.github.io/#+non-interactive%20bind%20shell
+    - Reverse shell: <https://gtfobins.github.io/#+reverse%20shell>
+    - Non-interactive reverse shell: <https://gtfobins.github.io/#+non-interactive%20reverse%20shell>
+    - Bind shell: <https://gtfobins.github.io/#+bind%20shell>
+    - Non-interactive bind shell: <https://gtfobins.github.io/#+non-interactive%20bind%20shell>
 2. Modified or substituted system binaries
     - for example, replace `/bin/false` with `/bin/bash` (usefull to hide a shell-login in `/etc/passwd`)
 3. System Binary Wrapping
@@ -341,7 +343,7 @@ Loadable kernel modules can be dynamically loaded into the Linux Kernel at runti
 - `#cat /proc/modules | grep OE`: Find unsigned or out-of-tree loaded modules.
 - `/sys/module/`: inforamtion about currently loaded kernel modules.
 - check kernel taint: `#cat /proc/sys/kernel/tainted`, `#dmesg | grep taint`  
-see https://docs.kernel.org/admin-guide/tainted-kernels.html  
+see <https://docs.kernel.org/admin-guide/tainted-kernels.html>  
 
 See external [tools](#rootkits-user--and-kernel-space) and Velociraptor artifacts under the "Rootkit" part.
 
@@ -379,17 +381,17 @@ Note that some of the listed tools don't required any installation on a subject 
 
 |Tool|Details|
 |---|---|
-| Sunlight | https://github.com/tstromberg/sunlight.git <br> set of powerfull bash scripts |
-| LinuxCatScale | https://github.com/WithSecureLabs/LinuxCatScale <br> bash script that uses live-of-the-land tools |
-| UAC | https://github.com/tclahr/uac <br> Use of native binaries and tools <br> **Runs everywhere with no dependencies (no installation required)** |
+| Sunlight | <https://github.com/tstromberg/sunlight.git> <br> set of powerfull bash scripts |
+| LinuxCatScale | <https://github.com/WithSecureLabs/LinuxCatScale> <br> bash script that uses live-of-the-land tools |
+| UAC | <https://github.com/tclahr/uac> <br> Use of native binaries and tools <br> **Runs everywhere with no dependencies (no installation required)** |
 | rkhunter | Rootkit, backdoor and local exploits scanner. |
 | chrootkit | Rootkit scanner. |
-| unhide | https://salsa.debian.org/pkg-security-team/unhide <br> (part of Kali) find processes and TCP/UDP ports hidden by rootkits |
+| unhide | <https://salsa.debian.org/pkg-security-team/unhide> <br> (part of Kali) find processes and TCP/UDP ports hidden by rootkits |
 | ClamAV | Antivirus scanner for Linux. |
-| bpftrace| https://github.com/bpftrace <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
-| Tracee | https://github.com/aquasecurity/tracee <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
-| Falco | https://github.com/falcosecurity/falco <br> Parses system calls against rules and alerts for violations. |
-| Velociraptor | https://github.com/Velocidex/velociraptor <br> Powerful hunting tool. |
+| bpftrace| <https://github.com/bpftrace> <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
+| Tracee | <https://github.com/aquasecurity/tracee> <br> Dynamic tracing tool using eBPF. A bunch of detection scripts are available. |
+| Falco | <https://github.com/falcosecurity/falco> <br> Parses system calls against rules and alerts for violations. |
+| Velociraptor | <https://github.com/Velocidex/velociraptor> <br> Powerful hunting tool. |
 | Sandfly | (licensed tool)<br> Will literally tear appart anything malicious on a Linux machine. Check out where its name came from. <br>  **Runs everywhere with no dependencies (no installation required)** | 
 
 ## 7. General Velociraptor Artifacts
