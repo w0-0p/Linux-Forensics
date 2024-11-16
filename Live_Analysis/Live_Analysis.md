@@ -297,6 +297,7 @@ Different scripts are executed when a shell starts or ends.
 | `~/.bash_logout` | User-specific clean up script at the end of the session |
 | `/etc/profile` | Systemwide files executed at the start of login shells |
 | `/etc/profile.d` | all the .sh files are executed at the start of login shells |
+
 2. **Environment Variables**  
 Each process has en environment list, wich is a set of environment variables. When a new process is created via *fork()*, it inherits a copy of its parent's environment. There are multiple use cases for environment variables. For example the env. variable `SHELL` defines the path to the shell that programms will use when they need a shell, or `HOME` that defines the home directory of a user.
 There are local and system-wide environment variables.  
