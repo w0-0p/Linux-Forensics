@@ -10,6 +10,7 @@
 ## 1. System Infos and Settings
 
 General System Overview
+
 |Command|Output|
 |---|---|
 **System Information** 
