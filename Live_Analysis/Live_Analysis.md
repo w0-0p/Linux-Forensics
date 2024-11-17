@@ -14,14 +14,14 @@ General System Overview
 |Command|Output|
 |---|---|
 |**System Information**||
-| `ls` | Note: timestamps can easily be manipulated. Don't trust 'ls' timestamps. |
+| `#ls` | Note: timestamps can easily be manipulated. Don't trust 'ls' timestamps. |
 |`#date`|Date, time, timezone|
 |`#uname -a` | System hostname, OS and Kernel versions|
 |`#uname -r` | Kernel version|
 |`#uname -n` | System hostname|
 |`#uname -m` | Kernel architecture| 
 |`#cat /etc/*-release` | Distribution information
-|`#cat /proc/stat \| grep btime` | System boot time  
+|<code>#cat /proc/stat &#124; grep btime</code> | System boot time  
 |**Users and Groups**||
 |[see](#2-users-user-groups-and-authentication-ssh)||  
 |**Networking**||
@@ -298,9 +298,7 @@ Different scripts are executed when a shell starts or ends.
 | `/etc/profile` | Systemwide files executed at the start of login shells |
 | `/etc/profile.d` | all the .sh files are executed at the start of login shells |
 
-<!-- Keep numbering -->
-
-2. **Environment Variables**  
+1. **Environment Variables**  
 Each process has en environment list, wich is a set of environment variables. When a new process is created via *fork()*, it inherits a copy of its parent's environment. There are multiple use cases for environment variables. For example the env. variable `SHELL` defines the path to the shell that programms will use when they need a shell, or `HOME` that defines the home directory of a user.
 There are local and system-wide environment variables.  
 
@@ -313,7 +311,7 @@ TO DO
 
 ### 6.6 System Binaries
 1. Living of the Land Binaries
-See https://gtfobins.github.io/
+See <https://gtfobins.github.io/>
     - Reverse shell: <https://gtfobins.github.io/#+reverse%20shell>
     - Non-interactive reverse shell: <https://gtfobins.github.io/#+non-interactive%20reverse%20shell>
     - Bind shell: <https://gtfobins.github.io/#+bind%20shell>
@@ -334,7 +332,7 @@ Replace a system binary by a malicious one, executing additionnal code without b
 **Velociraptor Artifacts**
 - `Linux.Debian.AptSources`: parses Debian apt sources
 - `Exchange.Linux.Sys.APTHistory`: parses the apt `history.log`, as well as archived history logs
-- `Linux.Debian.Packages`: parse dpkg status file
+- `Linux.Debian.Packages`: parses dpkg status file
 - `Linux.RHEL.Packages`: parses packages installed from dnf
 
 ### 6.7 Loadable Kernel Modules (LKM)
