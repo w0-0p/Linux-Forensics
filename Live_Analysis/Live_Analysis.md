@@ -21,7 +21,7 @@ General System Overview
 |`#uname -n` | System hostname|
 |`#uname -m` | Kernel architecture| 
 |`#cat /etc/*-release` | Distribution information
-|<code>#cat /proc/stat &#124; grep btime</code> | System boot time  
+|<code>#cat /proc/stat &#124; grep btime</code> | System boot time |
 |**Users and Groups**||
 |[see](#2-users-user-groups-and-authentication-ssh)||  
 |**Networking**||
